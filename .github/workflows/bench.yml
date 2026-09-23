@@ -8,7 +8,7 @@ on:
     inputs:
       repeats: {description: "repeats per scenario", default: "1"}
   push:
-    branches: [main]
+    branches: [master]
     paths: ["backend/app/**", "bench/**", "scenarios/fixtures/**"]
 
 permissions:
