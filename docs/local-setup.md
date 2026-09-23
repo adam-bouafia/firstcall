@@ -7,7 +7,7 @@ What runs where:
 
 | where | what | RAM |
 |---|---|---|
-| your laptop | k3s (Kubernetes) + the 8 broken apps | ≈ 0.7 GB |
+| your laptop | k3s (Kubernetes) + the broken demo apps | ≈ 0.7 GB |
 | your laptop | FirstCall API (Python) + console (Next.js) | ≈ 0.4 GB (dev mode) |
 | Nebius | the language model | 0 locally |
 | optional, laptop | Prometheus + Alertmanager + Grafana | ≈ 1–1.3 GB |
@@ -130,7 +130,7 @@ make cluster
 ```
 **You should see** `== preflight`, possibly `firewalld: trusting the k3s ... networks`, `waiting for k3s`,
 then a status line every 5 s while the node starts (`[  5s] utopia NotReady ...` → `Ready`),
-`coredns successfully rolled out`, the healthy baseline rolling out, then the 8 broken changes.
+`coredns successfully rolled out`, the healthy baseline rolling out, then the broken changes.
 If the node isn't Ready after 3 minutes the script stops and prints why (see *node never becomes Ready* below).
 
 **Check**
