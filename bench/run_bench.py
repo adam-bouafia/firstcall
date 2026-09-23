@@ -35,8 +35,7 @@ from app.llm.client import LLMResult, MockClient, get_client  # noqa: E402  (Bas
 class BaselineOpenAI:
     """Closed-model reference points. Benchmark only, never in the product path.
 
-    They answer the question judges ask: does the open model match a closed one, and at what cost?
-    Hackathon packs usually include OpenAI and Anthropic credits: this is what to spend them on.
+    They answer one question: does the open model match a closed one, and at what cost?
     """
 
     def __init__(self, model: str | None = None):
@@ -142,7 +141,7 @@ def main():
     ap.add_argument("-r", "--repeats", type=int, default=1)
     ap.add_argument("-s", "--scenario", action="append", help="limit to scenario(s)")
     ap.add_argument("--baseline", action="store_true",
-                    help="add the closed-model references (OpenAI + Anthropic, from the hackathon credits)")
+                    help="add the closed-model references (OpenAI + Anthropic, needs BASELINE_* keys)")
     ap.add_argument("--provider", help="only models from this provider (nebius, ollama, openrouter)")
     ap.add_argument("--live", action="store_true", help="snapshot the live cluster (scenarios applied) instead of fixtures")
     a = ap.parse_args()
@@ -260,7 +259,8 @@ def main():
             f"| {len(rs) - len(ok)} |")
     lines += ["", "*score* = 0.5 category + 0.3 root-cause keywords + 0.2 command. "
               "*comparable* = 0.6 root cause + 0.4 command, the only fields k8sgpt also produces. "
-              "*right fix proposed* = an allow-listed one-click fix of the expected kind, on the 5 scenarios that have one."]
+              "*right fix proposed* = an allow-listed one-click fix of the expected kind, "
+              f"on the {sum(1 for s in scenarios if truth[s].get('remediation_any'))} scenarios that have one."]
     md = "\n".join(lines)
     (out / f"{stamp}.md").write_text(md + "\n")
     print("\n" + md + f"\n\nSaved bench/results/{stamp}.*")

@@ -127,6 +127,9 @@ class MockClient:
         if cat in ("ImagePull", "CrashLoop-AppError", "OOMKilled", "ProbeFailure") and '"previous_revision"' in user and dep:
             rem = f"kubectl rollout undo deployment/{dep.group(1)} -n {ns}"
             change = "The latest rollout changed the pod template shortly before the failure."
+        elif cat == "ServiceSelector" and pod.startswith("svc/") and (
+                zero := re.search(r'"deployment":"([^"]+)","replicas":0', user)):
+            rem = f"kubectl scale deployment/{zero.group(1)} --replicas=1 -n {ns}"
         elif cat == "ServiceSelector" and pod.startswith("svc/"):
             rem = f"kubectl patch service {pod[4:]} -n {ns} -p '{{\"spec\":{{\"selector\":{{\"app\":\"{pod[4:]}-api\"}}}}}}'"
         body = {"summary": f"[mock] {cat} on {pod}", "category": cat, "root_cause": cause, "confidence": 0.5,

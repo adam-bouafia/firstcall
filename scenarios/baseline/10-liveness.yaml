@@ -1,0 +1,20 @@
+# Healthy v1.8.0: warms its index for 15 s, then serves :80. Readiness waits 20 s.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-api
+  namespace: firstcall-demo
+  annotations: {kubernetes.io/change-cause: "deploy search-api v1.8.0"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: search-api}}
+  template:
+    metadata: {labels: {app: search-api}}
+    spec:
+      containers:
+      - name: api
+        image: busybox:1.36
+        command: ["sh", "-c", "echo 'warming search index (15s)'; sleep 15; mkdir -p /www && echo ok > /www/index.html && echo ready && httpd -f -p 80 -h /www"]
+        ports: [{containerPort: 80}]
+        readinessProbe: {httpGet: {path: /, port: 80}, initialDelaySeconds: 20, periodSeconds: 5}
+        resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {memory: 32Mi}}

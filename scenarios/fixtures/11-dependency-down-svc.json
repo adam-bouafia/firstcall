@@ -1,0 +1,194 @@
+{
+  "reason": "NoEndpoints",
+  "age": "7m",
+  "snapshot": {
+    "namespace": "firstcall-demo",
+    "pod": "svc/inventory-db",
+    "phase": "NoEndpoints",
+    "workload": "service/inventory-db",
+    "pod_summary": {
+      "service": {
+        "selector": {
+          "app": "inventory-db"
+        },
+        "ports": [
+          {
+            "app_protocol": null,
+            "name": null,
+            "node_port": null,
+            "port": 5432,
+            "protocol": "TCP",
+            "target_port": 5432
+          }
+        ]
+      }
+    },
+    "container_statuses": [],
+    "events": [],
+    "logs": {},
+    "metrics": {},
+    "related": {
+      "pods_in_namespace": [
+        {
+          "name": "auth-svc-755c8577d5-578dv",
+          "labels": {
+            "app": "auth-svc",
+            "pod-template-hash": "755c8577d5"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "auth-svc-c9b5b55cf-69kzc",
+          "labels": {
+            "app": "auth-svc",
+            "pod-template-hash": "c9b5b55cf"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "cart-api-665df88fd9-r7k97",
+          "labels": {
+            "app": "cart-api",
+            "pod-template-hash": "665df88fd9"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "catalog-api-7fdc4c6b56-d6bzt",
+          "labels": {
+            "app": "catalog-api",
+            "pod-template-hash": "7fdc4c6b56"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "catalog-api-97ff4784-k6qm2",
+          "labels": {
+            "app": "catalog-api",
+            "pod-template-hash": "97ff4784"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "checkout-web-6d8644c66b-cnc46",
+          "labels": {
+            "app": "checkout-web",
+            "pod-template-hash": "6d8644c66b"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "checkout-web-78fd85c868-klgnt",
+          "labels": {
+            "app": "checkout-web",
+            "pod-template-hash": "78fd85c868"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "gpu-inference-76d455bd7-57t54",
+          "labels": {
+            "app": "gpu-inference",
+            "pod-template-hash": "76d455bd7"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "ledger-db-7b4ff88869-vf2cq",
+          "labels": {
+            "app": "ledger-db",
+            "pod-template-hash": "7b4ff88869"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "ml-batch-778d47867d-zxmgp",
+          "labels": {
+            "app": "ml-batch",
+            "pod-template-hash": "778d47867d"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "notify-svc-764db57db7-292vm",
+          "labels": {
+            "app": "notify-svc",
+            "pod-template-hash": "764db57db7"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "orders-588bbc866-mzh5n",
+          "labels": {
+            "app": "orders-api",
+            "pod-template-hash": "588bbc866"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "orders-588bbc866-q26sz",
+          "labels": {
+            "app": "orders-api",
+            "pod-template-hash": "588bbc866"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "payments-api-6b9f56f776-vblwm",
+          "labels": {
+            "app": "payments-api",
+            "pod-template-hash": "6b9f56f776"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "report-worker-6fb4bcf5cc-qdnm6",
+          "labels": {
+            "app": "report-worker",
+            "pod-template-hash": "6fb4bcf5cc"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "search-api-6d648fdf98-rhsmg",
+          "labels": {
+            "app": "search-api",
+            "pod-template-hash": "6d648fdf98"
+          },
+          "phase": "Running"
+        }
+      ],
+      "workloads_matching_selector": [
+        {
+          "deployment": "inventory-db",
+          "replicas": 0,
+          "ready_replicas": 0
+        }
+      ]
+    }
+  },
+  "expected": {
+    "category": "ServiceSelector",
+    "keywords": [
+      [
+        "inventory-db"
+      ],
+      [
+        "replicas",
+        "scaled",
+        "0"
+      ]
+    ],
+    "command_any": [
+      "get deploy",
+      "describe deploy",
+      "get endpoints",
+      "get ep",
+      "get pods",
+      "get endpointslice"
+    ],
+    "remediation_any": [
+      "scale"
+    ]
+  }
+}

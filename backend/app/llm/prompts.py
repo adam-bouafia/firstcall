@@ -32,7 +32,10 @@ Rules:
   ProbeFailure        the container runs, a liveness/readiness probe fails.
   Unschedulable       Pending, no node fits (insufficient cpu/memory, taints, affinity).
   StoragePending      Pending on a PVC that is not Bound.
-  ServiceSelector     the pods are healthy; a Service selects nothing / has no endpoints.
+  ServiceSelector     a Service selects nothing / has no endpoints: a label mismatch, or the workload it
+                      selects is scaled to 0 (`related.workloads_matching_selector`).
+- When the logs show the app failing to reach ANOTHER service, the root cause is usually that
+  dependency, not this workload: name it, and aim `next_command` and `remediation_command` at it.
 
 Reply with ONLY a JSON object, no markdown fences:
 {"summary": str, "category": str, "root_cause": str, "confidence": float 0..1,

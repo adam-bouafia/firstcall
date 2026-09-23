@@ -1,0 +1,18 @@
+# Root cause: nodeSelector accelerator=nvidia-a100, and no node has that label. Pending with
+# FailedScheduling "didn't match Pod's node affinity/selector". Unlike 04, adding resources does not
+# help: remove the selector (or label a node that really has the GPU).
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: gpu-inference, namespace: firstcall-demo}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: gpu-inference}}
+  template:
+    metadata: {labels: {app: gpu-inference}}
+    spec:
+      nodeSelector: {accelerator: nvidia-a100}
+      containers:
+      - name: model
+        image: busybox:1.36
+        command: ["sh", "-c", "echo serving; sleep 3600"]
+        resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {memory: 32Mi}}

@@ -1,0 +1,288 @@
+{
+  "reason": "CrashLoopBackOff",
+  "age": "7m",
+  "snapshot": {
+    "namespace": "firstcall-demo",
+    "pod": "search-api-6d648fdf98-rhsmg",
+    "phase": "Running",
+    "workload": "deployment/search-api",
+    "pod_summary": {
+      "node": "utopia",
+      "service_account": "default",
+      "labels": {
+        "app": "search-api",
+        "pod-template-hash": "6d648fdf98"
+      },
+      "containers": [
+        {
+          "name": "api",
+          "image": "busybox:1.36",
+          "command": [
+            "sh",
+            "-c",
+            "echo 'warming search index (15s)'; sleep 15; mkdir -p /www && echo ok > /www/index.html && echo ready && httpd -f -p 80 -h /www"
+          ],
+          "args": null,
+          "ports": [
+            80
+          ],
+          "env_names": [],
+          "env_from": [],
+          "resources": {
+            "claims": null,
+            "limits": {
+              "memory": "32Mi"
+            },
+            "requests": {
+              "cpu": "10m",
+              "memory": "16Mi"
+            }
+          },
+          "readiness_probe": {
+            "_exec": null,
+            "failure_threshold": 3,
+            "grpc": null,
+            "http_get": {
+              "host": null,
+              "http_headers": null,
+              "path": "/",
+              "port": 80,
+              "scheme": "HTTP"
+            },
+            "initial_delay_seconds": 20,
+            "period_seconds": 5,
+            "success_threshold": 1,
+            "tcp_socket": null,
+            "termination_grace_period_seconds": null,
+            "timeout_seconds": 1
+          },
+          "liveness_probe": {
+            "_exec": null,
+            "failure_threshold": 2,
+            "grpc": null,
+            "http_get": {
+              "host": null,
+              "http_headers": null,
+              "path": "/",
+              "port": 80,
+              "scheme": "HTTP"
+            },
+            "initial_delay_seconds": null,
+            "period_seconds": 3,
+            "success_threshold": 1,
+            "tcp_socket": null,
+            "termination_grace_period_seconds": null,
+            "timeout_seconds": 1
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "name": "kube-api-access-6jtdh",
+          "projected": {
+            "default_mode": 420,
+            "sources": [
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": {
+                  "audience": null,
+                  "expiration_seconds": 3607,
+                  "path": "token"
+                }
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": {
+                  "items": [
+                    {
+                      "key": "ca.crt",
+                      "mode": null,
+                      "path": "ca.crt"
+                    }
+                  ],
+                  "name": "kube-root-ca.crt",
+                  "optional": null
+                },
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": {
+                  "items": [
+                    {
+                      "field_ref": {
+                        "api_version": "v1",
+                        "field_path": "metadata.namespace"
+                      },
+                      "mode": null,
+                      "path": "namespace",
+                      "resource_field_ref": null
+                    }
+                  ]
+                },
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              }
+            ]
+          }
+        }
+      ],
+      "conditions": [
+        {
+          "type": "PodReadyToStartContainers",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Initialized",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Ready",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [api]"
+        },
+        {
+          "type": "ContainersReady",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [api]"
+        },
+        {
+          "type": "PodScheduled",
+          "status": "True",
+          "reason": null,
+          "message": null
+        }
+      ]
+    },
+    "container_statuses": [
+      {
+        "name": "api",
+        "ready": false,
+        "restart_count": 6,
+        "state": "waiting",
+        "reason": "CrashLoopBackOff",
+        "message": "back-off 2m40s restarting failed container=api pod=search-api-6d648fdf98-rhsmg_firstcall-demo(568ab555-0cc9-41b1-bba6-266ea8f5d293)",
+        "last_terminated": {
+          "reason": "Error",
+          "exit_code": 137
+        }
+      }
+    ],
+    "events": [
+      {
+        "type": "Normal",
+        "reason": "Scheduled",
+        "message": "Successfully assigned firstcall-demo/search-api-6d648fdf98-rhsmg to utopia",
+        "count": null
+      },
+      {
+        "type": "Normal",
+        "reason": "Created",
+        "message": "Container created",
+        "count": 6
+      },
+      {
+        "type": "Normal",
+        "reason": "Started",
+        "message": "Container started",
+        "count": 6
+      },
+      {
+        "type": "Normal",
+        "reason": "Killing",
+        "message": "Container api failed liveness probe, will be restarted",
+        "count": 6
+      },
+      {
+        "type": "Normal",
+        "reason": "Pulled",
+        "message": "Container image \"busybox:1.36\" already present on machine and can be accessed by the pod",
+        "count": 7
+      },
+      {
+        "type": "Warning",
+        "reason": "Unhealthy",
+        "message": "Liveness probe failed: Get \"http://10.42.0.42:80/\": dial tcp 10.42.0.42:80: connect: connection refused",
+        "count": 14
+      },
+      {
+        "type": "Warning",
+        "reason": "BackOff",
+        "message": "Back-off restarting failed container api in pod search-api-6d648fdf98-rhsmg_firstcall-demo(568ab555-0cc9-41b1-bba6-266ea8f5d293)",
+        "count": 9
+      }
+    ],
+    "logs": {
+      "api": "--- previous ---\nwarming search index (15s)\nready\n\n--- current ---\nwarming search index (15s)\nready\n"
+    },
+    "metrics": {},
+    "related": {
+      "services": [],
+      "pvcs": [],
+      "recent_changes": {
+        "deployment": "search-api",
+        "current_revision": 2,
+        "current_deployed": "7m ago",
+        "history": [
+          {
+            "revision": 1,
+            "age": "7m",
+            "change_cause": "deploy search-api v1.8.0"
+          },
+          {
+            "revision": 2,
+            "age": "7m",
+            "change_cause": "deploy search-api v1.8.1 (add liveness probe)"
+          }
+        ],
+        "previous_revision": 1,
+        "diff": [
+          "api: livenessProbe None -> {'failureThreshold': 2, 'httpGet': {'path': '/', 'port': 80, 'scheme': 'HTTP'}, 'periodSeconds': 3, 'successThreshold': 1, 'timeoutSeconds': 1}"
+        ]
+      }
+    }
+  },
+  "expected": {
+    "category": "ProbeFailure",
+    "keywords": [
+      [
+        "liveness"
+      ],
+      [
+        "initialdelay",
+        "startup",
+        "warm",
+        "15",
+        "too early",
+        "before"
+      ]
+    ],
+    "command_any": [
+      "describe pod",
+      "get events",
+      "logs",
+      "rollout history",
+      "get deploy",
+      "describe deploy"
+    ],
+    "remediation_any": [
+      "rollout undo",
+      "patch"
+    ]
+  }
+}

@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # End-to-end product test against a live cluster where FirstCall is already running.
-#   detect all 8 -> diagnosed -> Event on the workload -> Alertmanager note -> fixes -> all resolved
+#   detect every scenario -> diagnosed -> Event on the workload -> Alertmanager note -> fixes -> all resolved
 # Usage: API_URL=http://localhost:8000 ./scripts/e2e.sh      (CI port-forwards the in-cluster API)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 API=${API_URL:-http://localhost:8000}
 NS=firstcall-demo
-EXPECTED=${EXPECTED:-8}
+# one incident per recorded fixture (11-dependency-down yields two: cart-api and svc/inventory-db)
+EXPECTED=${EXPECTED:-$(ls scenarios/fixtures/*.json | wc -l)}
 TIMEOUT=${TIMEOUT:-420}
 c() { curl -sf --noproxy '*' "$@"; }
 pass() { echo "  ✔ $*"; }

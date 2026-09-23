@@ -1,0 +1,24 @@
+# Root cause: v1.8.1 adds a liveness probe with no initial delay. The kubelet kills the container
+# after ~6 s, before the 15 s warm-up ends, so it never serves. It shows up as CrashLoopBackOff with
+# exit code 137, which looks like OOM or an app crash; the events say "Liveness probe failed".
+# Fix: initialDelaySeconds >= 20 or a startupProbe (or roll back).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-api
+  namespace: firstcall-demo
+  annotations: {kubernetes.io/change-cause: "deploy search-api v1.8.1 (add liveness probe)"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: search-api}}
+  template:
+    metadata: {labels: {app: search-api}}
+    spec:
+      containers:
+      - name: api
+        image: busybox:1.36
+        command: ["sh", "-c", "echo 'warming search index (15s)'; sleep 15; mkdir -p /www && echo ok > /www/index.html && echo ready && httpd -f -p 80 -h /www"]
+        ports: [{containerPort: 80}]
+        readinessProbe: {httpGet: {path: /, port: 80}, initialDelaySeconds: 20, periodSeconds: 5}
+        livenessProbe: {httpGet: {path: /, port: 80}, initialDelaySeconds: 0, periodSeconds: 3, failureThreshold: 2}
+        resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {memory: 32Mi}}

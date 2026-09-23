@@ -1,0 +1,187 @@
+{
+  "reason": "Unschedulable",
+  "age": "7m",
+  "snapshot": {
+    "namespace": "firstcall-demo",
+    "pod": "gpu-inference-76d455bd7-57t54",
+    "phase": "Pending",
+    "workload": "deployment/gpu-inference",
+    "pod_summary": {
+      "node": null,
+      "service_account": "default",
+      "labels": {
+        "app": "gpu-inference",
+        "pod-template-hash": "76d455bd7"
+      },
+      "containers": [
+        {
+          "name": "model",
+          "image": "busybox:1.36",
+          "command": [
+            "sh",
+            "-c",
+            "echo serving; sleep 3600"
+          ],
+          "args": null,
+          "ports": [],
+          "env_names": [],
+          "env_from": [],
+          "resources": {
+            "claims": null,
+            "limits": {
+              "memory": "32Mi"
+            },
+            "requests": {
+              "cpu": "10m",
+              "memory": "16Mi"
+            }
+          },
+          "readiness_probe": null,
+          "liveness_probe": null
+        }
+      ],
+      "volumes": [
+        {
+          "name": "kube-api-access-wtk9h",
+          "projected": {
+            "default_mode": 420,
+            "sources": [
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": {
+                  "audience": null,
+                  "expiration_seconds": 3607,
+                  "path": "token"
+                }
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": {
+                  "items": [
+                    {
+                      "key": "ca.crt",
+                      "mode": null,
+                      "path": "ca.crt"
+                    }
+                  ],
+                  "name": "kube-root-ca.crt",
+                  "optional": null
+                },
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": {
+                  "items": [
+                    {
+                      "field_ref": {
+                        "api_version": "v1",
+                        "field_path": "metadata.namespace"
+                      },
+                      "mode": null,
+                      "path": "namespace",
+                      "resource_field_ref": null
+                    }
+                  ]
+                },
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              }
+            ]
+          }
+        }
+      ],
+      "conditions": [
+        {
+          "type": "PodScheduled",
+          "status": "False",
+          "reason": "Unschedulable",
+          "message": "0/1 nodes are available: 1 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling."
+        }
+      ]
+    },
+    "container_statuses": [],
+    "events": [
+      {
+        "type": "Warning",
+        "reason": "FailedScheduling",
+        "message": "0/1 nodes are available: 1 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.",
+        "count": null
+      },
+      {
+        "type": "Warning",
+        "reason": "FailedScheduling",
+        "message": "0/1 nodes are available: 1 node(s) didn't match Pod's node affinity/selector. no new claims to deallocate, preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.",
+        "count": null
+      }
+    ],
+    "logs": {
+      "model": ""
+    },
+    "metrics": {},
+    "related": {
+      "services": [],
+      "pvcs": [],
+      "nodes": [
+        {
+          "name": "utopia",
+          "allocatable": {
+            "cpu": "8",
+            "ephemeral-storage": "484363625707",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "16098892Ki",
+            "pods": "110"
+          },
+          "taints": []
+        }
+      ],
+      "recent_changes": {
+        "deployment": "gpu-inference",
+        "current_revision": 1,
+        "current_deployed": "7m ago",
+        "history": [
+          {
+            "revision": 1,
+            "age": "7m",
+            "change_cause": ""
+          }
+        ],
+        "note": "first rollout: no previous revision to compare"
+      }
+    }
+  },
+  "expected": {
+    "category": "Unschedulable",
+    "keywords": [
+      [
+        "nodeselector",
+        "node affinity",
+        "selector"
+      ],
+      [
+        "accelerator",
+        "nvidia-a100"
+      ]
+    ],
+    "command_any": [
+      "get nodes --show-labels",
+      "get nodes -l",
+      "get node",
+      "describe node",
+      "describe pod"
+    ],
+    "remediation_any": [
+      "patch"
+    ]
+  }
+}

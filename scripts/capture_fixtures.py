@@ -1,5 +1,7 @@
 """Record live snapshots from the kind cluster into scenarios/fixtures, keeping each
-scenario's `expected` ground-truth block. Run after `make scenarios` + ~3 minutes."""
+scenario's `expected` ground-truth block. Run after `make scenarios` + ~3 minutes.
+    python scripts/capture_fixtures.py                    # every scenario
+    python scripts/capture_fixtures.py 09-secret-key ...  # only these (leaves the others untouched)"""
 import json
 import sys
 from pathlib import Path
@@ -14,15 +16,18 @@ WORKLOAD_TO_SCENARIO = {
     "payments-api": "01-crashloop", "checkout-web": "02-imagepull", "report-worker": "03-oom",
     "ml-batch": "04-unschedulable", "catalog-api": "05-probe", "notify-svc": "06-config-missing",
     "orders": "07-service-selector", "ledger-db": "08-pvc-pending",
+    "auth-svc": "09-secret-key", "search-api": "10-liveness", "cart-api": "11-dependency-down",
+    "inventory-db": "11-dependency-down-svc", "gpu-inference": "12-node-selector",
 }
 
 def main():
+    only = set(sys.argv[1:])
     src = ClusterSource(["firstcall-demo"])
     seen = set()
     for inc in src.list_incidents():
         name = (inc.workload or inc.pod).split("/", 1)[-1]
         sc = WORKLOAD_TO_SCENARIO.get(name)
-        if not sc or sc in seen:
+        if not sc or sc in seen or (only and sc not in only):
             continue
         seen.add(sc)
         path = FIX / f"{sc}.json"
@@ -32,7 +37,7 @@ def main():
                 "expected": old.get("expected", {})}
         path.write_text(json.dumps(data, indent=2, default=str) + "\n")
         print(f"captured {sc:<22} <- {inc.namespace}/{inc.pod} ({inc.reason})")
-    missing = set(WORKLOAD_TO_SCENARIO.values()) - seen
+    missing = (only or set(WORKLOAD_TO_SCENARIO.values())) - seen
     if missing:
         print("not yet broken (wait and re-run):", ", ".join(sorted(missing)))
 

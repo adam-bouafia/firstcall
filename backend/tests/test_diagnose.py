@@ -3,9 +3,11 @@ import time
 from fastapi.testclient import TestClient
 
 from app.diagnose import parse_diagnosis
+from app.config import get_settings
 from app.main import app, engine
 
 c = TestClient(app)
+N = len(list(get_settings().fixtures_dir.glob("*.json")))  # one incident per recorded scenario
 
 
 def wait_idle(timeout=10):
@@ -28,10 +30,10 @@ def test_unknown_category_falls_back():
 
 def test_scan_detects_and_auto_diagnoses():
     r = c.post("/api/scan").json()
-    assert r["seen"] == 8  # (new may be 0 if another test module scanned first)
+    assert r["seen"] == N  # (new may be 0 if another test module scanned first)
     wait_idle()
     incs = c.get("/api/incidents").json()
-    assert len(incs) == 8 and all(i["category"] and i["category"] != "Other" for i in incs)
+    assert len(incs) == N and all(i["category"] and i["category"] != "Other" for i in incs)
     # second scan: nothing new
     assert c.post("/api/scan").json()["new"] == []
 
@@ -60,7 +62,7 @@ def test_resolution_after_healthy_scans(monkeypatch):
     e.scan()
     assert c.get("/api/stats").json()["resolved"] == 0  # needs 2 healthy scans
     e.scan()
-    assert c.get("/api/stats").json()["resolved"] == 8
+    assert c.get("/api/stats").json()["resolved"] == N
 
 
 def test_compare_stateless():

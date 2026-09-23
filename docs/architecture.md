@@ -92,11 +92,10 @@ and tracks the incident until the cluster is healthy again.
 Logs contain customer data and secrets. Teams in the EU often cannot paste them into a closed
 chatbot. Open weights mean the same model can run on Token Factory today and inside the
 customer's own VPC tomorrow. *Rejected:* a closed frontier API (compliance blocker for the exact
-customer we target); self-hosting GPUs for the hackathon (cost and time).
+customer we target); requiring self-hosted GPUs from day one (cost and setup time).
 
 **2. Provider-agnostic registry.** Develop for free on Ollama on a laptop, demo on Token
-Factory, compare on OpenRouter: it is one line in `.env`, no code change. That same property is
-the "adaptability" claim in the pitch.
+Factory, compare on OpenRouter: it is one line in `.env`, no code change.
 
 **3. Curated snapshot + one call, not a free-roaming agent.** The collector already gathers
 what a senior engineer would look at first, so the model reasons over about 1,000 tokens instead
@@ -185,7 +184,7 @@ step is in the timeline and posted as a Kubernetes Event; the normal resolve loo
 model call (latency, tokens, cost), command, Event, push and fix goes to an in-memory feed:
 console panel, `make activity`, `/api/activity`.
 
-**17. k8sgpt as the baseline.** The most likely judge question is "how is this different from
+**17. k8sgpt as the baseline.** The first question people ask is "how is this different from
 k8sgpt?". The benchmark answers it with numbers: same cluster, same model, same ground truth
 ([k8sgpt-comparison.md](k8sgpt-comparison.md)).
 
@@ -209,11 +208,12 @@ leaves at all.
   on every alert is affordable.
 - The same weights can be self-hosted later, which closed models cannot offer.
 
-## Limits (say them before a judge does)
+## Limits
 - Regex redaction can miss novel secret formats; env var values are never collected, which is
   the stronger guarantee.
 - One cluster per backend; single replica.
-- The 8 scenarios are deliberate failures, not a customer's incident history.
+- The 12 scenarios are deliberate failures written by the author, not a real incident history, and the
+  ground truth is authored too: treat the benchmark as a regression gate, not proof of accuracy.
 - Logs are tailed (80 lines per container), so a root cause buried earlier can be missed.
 
 ## Roadmap

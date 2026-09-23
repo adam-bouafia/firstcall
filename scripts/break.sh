@@ -10,17 +10,22 @@ NS=firstcall-demo
 target=${1:-all}
 kubectl apply -f scenarios/manifests/00-namespace.yaml >/dev/null
 
-if [ "$target" = all ]; then files=(scenarios/manifests/0[1-9]*.yaml); else files=("scenarios/manifests/$target.yaml"); fi
+if [ "$target" = all ]; then
+  files=(); for f in scenarios/manifests/[0-9][0-9]-*.yaml; do [[ $f == */00-* ]] || files+=("$f"); done
+else
+  files=("scenarios/manifests/$target.yaml")
+fi
 
 baselines=()
 for f in "${files[@]}"; do b="scenarios/baseline/$(basename "$f")"; [ -f "$b" ] && baselines+=("$b"); done
 if [ ${#baselines[@]} -gt 0 ]; then
   echo "== 1/2 healthy baseline: ${#baselines[@]} deployment(s)"
-  for b in "${baselines[@]}"; do kubectl apply -f "$b"; done
+  deploys=()
   for b in "${baselines[@]}"; do
-    d=$(awk '/^  name:/ {print $2; exit}' "$b")
-    kubectl -n $NS rollout status deploy/"$d" --timeout=120s | sed 's/^/   /'
+    kubectl apply -f "$b"
+    deploys+=($(kubectl apply -f "$b" --dry-run=client -o name | grep '^deployment'))
   done
+  for d in "${deploys[@]}"; do kubectl -n $NS rollout status "$d" --timeout=120s | sed 's/^/   /'; done
 fi
 echo "== 2/2 applying the broken change(s)"
 for f in "${files[@]}"; do kubectl apply -f "$f"; done
