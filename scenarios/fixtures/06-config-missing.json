@@ -1,0 +1,216 @@
+{
+  "reason": "CreateContainerConfigError",
+  "age": "1m",
+  "snapshot": {
+    "namespace": "firstcall-demo",
+    "pod": "notify-svc-5f5b786b44-k4x8g",
+    "phase": "Pending",
+    "workload": "deployment/notify-svc",
+    "pod_summary": {
+      "node": "vm",
+      "service_account": "default",
+      "labels": {
+        "app": "notify-svc",
+        "pod-template-hash": "5f5b786b44"
+      },
+      "containers": [
+        {
+          "name": "svc",
+          "image": "busybox:1.36",
+          "command": [
+            "sh",
+            "-c",
+            "env; sleep 3600"
+          ],
+          "args": null,
+          "ports": [],
+          "env_names": [],
+          "env_from": [
+            "configMap/notify-config"
+          ],
+          "resources": {
+            "claims": null,
+            "limits": null,
+            "requests": null
+          },
+          "readiness_probe": null,
+          "liveness_probe": null
+        }
+      ],
+      "volumes": [
+        {
+          "name": "kube-api-access-rxwkk",
+          "projected": {
+            "default_mode": 420,
+            "sources": [
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": {
+                  "audience": null,
+                  "expiration_seconds": 3607,
+                  "path": "token"
+                }
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": {
+                  "items": [
+                    {
+                      "key": "ca.crt",
+                      "mode": null,
+                      "path": "ca.crt"
+                    }
+                  ],
+                  "name": "kube-root-ca.crt",
+                  "optional": null
+                },
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": {
+                  "items": [
+                    {
+                      "field_ref": {
+                        "api_version": "v1",
+                        "field_path": "metadata.namespace"
+                      },
+                      "mode": null,
+                      "path": "namespace",
+                      "resource_field_ref": null
+                    }
+                  ]
+                },
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              }
+            ]
+          }
+        }
+      ],
+      "conditions": [
+        {
+          "type": "PodReadyToStartContainers",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Initialized",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Ready",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [svc]"
+        },
+        {
+          "type": "ContainersReady",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [svc]"
+        },
+        {
+          "type": "PodScheduled",
+          "status": "True",
+          "reason": null,
+          "message": null
+        }
+      ]
+    },
+    "container_statuses": [
+      {
+        "name": "svc",
+        "ready": false,
+        "restart_count": 0,
+        "state": "waiting",
+        "reason": "CreateContainerConfigError",
+        "message": "configmap \"notify-config\" not found"
+      }
+    ],
+    "events": [
+      {
+        "type": "Normal",
+        "reason": "Scheduled",
+        "message": "Successfully assigned firstcall-demo/notify-svc-5f5b786b44-k4x8g to vm",
+        "count": null
+      },
+      {
+        "type": "Normal",
+        "reason": "Pulled",
+        "message": "Container image \"busybox:1.36\" already present on machine",
+        "count": 8
+      },
+      {
+        "type": "Warning",
+        "reason": "Failed",
+        "message": "Error: configmap \"notify-config\" not found",
+        "count": 8
+      }
+    ],
+    "logs": {
+      "svc": ""
+    },
+    "metrics": {},
+    "related": {
+      "services": [],
+      "pvcs": [],
+      "nodes": [
+        {
+          "name": "vm",
+          "allocatable": {
+            "cpu": "2",
+            "ephemeral-storage": "257025515114",
+            "hugepages-1Gi": "0",
+            "hugepages-2Mi": "0",
+            "memory": "8224868Ki",
+            "pods": "110"
+          },
+          "taints": []
+        }
+      ],
+      "recent_changes": {
+        "deployment": "notify-svc",
+        "current_revision": 1,
+        "current_deployed": "1m ago",
+        "history": [
+          {
+            "revision": 1,
+            "age": "1m",
+            "change_cause": ""
+          }
+        ],
+        "note": "first rollout: no previous revision to compare"
+      }
+    }
+  },
+  "expected": {
+    "category": "ConfigMissing",
+    "keywords": [
+      [
+        "notify-config"
+      ],
+      [
+        "configmap",
+        "ConfigMap"
+      ]
+    ],
+    "command_any": [
+      "get configmap",
+      "get cm",
+      "describe"
+    ]
+  }
+}

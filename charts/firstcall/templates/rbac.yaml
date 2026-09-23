@@ -1,0 +1,45 @@
+{{- if .Values.rbac.create }}
+# Read-only by design: no secrets, no pods/exec, no write verbs on workloads.
+# The single write permission is creating Events, used to post diagnoses where
+# `kubectl describe` shows them (disable with writeEvents=false).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "firstcall.fullname" . }}-readonly
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: [pods, pods/log, events, services, endpoints, persistentvolumeclaims, nodes, namespaces, configmaps]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, statefulsets, daemonsets]
+    verbs: [get, list, watch]
+  - apiGroups: [discovery.k8s.io]
+    resources: [endpointslices]
+    verbs: [get, list, watch]
+  - apiGroups: [storage.k8s.io]
+    resources: [storageclasses]
+    verbs: [get, list]
+  - apiGroups: [metrics.k8s.io]
+    resources: [pods, nodes]
+    verbs: [get, list]
+  {{- if .Values.writeEvents }}
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [create]
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "firstcall.fullname" . }}-readonly
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "firstcall.fullname" . }}-readonly
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "firstcall.serviceAccount" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

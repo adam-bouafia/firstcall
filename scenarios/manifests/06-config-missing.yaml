@@ -1,0 +1,15 @@
+# Root cause: envFrom references ConfigMap notify-config, which does not exist.
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: notify-svc, namespace: firstcall-demo}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: notify-svc}}
+  template:
+    metadata: {labels: {app: notify-svc}}
+    spec:
+      containers:
+      - name: svc
+        image: busybox:1.36
+        command: ["sh", "-c", "env; sleep 3600"]
+        envFrom: [{configMapRef: {name: notify-config}}]

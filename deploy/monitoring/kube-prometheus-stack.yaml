@@ -1,0 +1,90 @@
+# Slim kube-prometheus-stack for a laptop k3s (~1-1.3 GB RAM total).
+#   make monitoring        (helm upgrade --install monitoring prometheus-community/kube-prometheus-stack -n monitoring -f this file)
+# Wires: Prometheus scrapes FirstCall (ServiceMonitor from the FirstCall chart),
+#        Alertmanager sends every namespaced alert to FirstCall's webhook,
+#        Grafana loads the FirstCall dashboard ConfigMap from any namespace.
+
+# k3s runs etcd/scheduler/controller-manager/proxy inside one process: these scrapes would only produce false "Down" alerts
+kubeEtcd: {enabled: false}
+kubeScheduler: {enabled: false}
+kubeControllerManager: {enabled: false}
+kubeProxy: {enabled: false}
+nodeExporter: {enabled: false}          # saves ~100 MB; FirstCall does not need host metrics
+windowsMonitoring: {enabled: false}
+
+defaultRules:
+  create: true
+  rules:
+    etcd: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+    kubeControllerManager: false
+    kubeProxy: false
+    node: false
+    nodeExporterAlerting: false
+    nodeExporterRecording: false
+
+prometheus:
+  prometheusSpec:
+    retention: 12h
+    scrapeInterval: 15s
+    evaluationInterval: 15s
+    # pick up ServiceMonitors / PrometheusRules from every release, not only this one
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    resources:
+      requests: {cpu: 100m, memory: 300Mi}
+      limits: {memory: 700Mi}
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: {cpu: 10m, memory: 32Mi}
+      limits: {memory: 128Mi}
+  config:
+    global:
+      resolve_timeout: 2m
+    route:
+      receiver: "null"
+      group_by: [alertname, namespace, pod]
+      group_wait: 10s
+      group_interval: 30s
+      repeat_interval: 30m
+      routes:
+        - receiver: "null"
+          matchers: ['alertname =~ "Watchdog|InfoInhibitor"']
+        - receiver: firstcall
+          matchers: ['namespace =~ ".+"']
+          continue: false
+    receivers:
+      - name: "null"
+      - name: firstcall
+        webhook_configs:
+          - url: http://firstcall-api.firstcall-system.svc:8000/api/alertmanager
+            send_resolved: true
+            max_alerts: 20
+
+kube-state-metrics:
+  resources:
+    requests: {cpu: 10m, memory: 32Mi}
+    limits: {memory: 128Mi}
+
+grafana:
+  adminPassword: firstcall        # local demo only
+  service:
+    type: NodePort
+    nodePort: 30301                # http://localhost:30301  (admin / firstcall)
+  resources:
+    requests: {cpu: 20m, memory: 96Mi}
+    limits: {memory: 256Mi}
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: ALL
+  grafana.ini:
+    auth.anonymous:
+      enabled: true               # viewers (judges) can open the dashboard without logging in
+      org_role: Viewer

@@ -1,0 +1,11 @@
+FirstCall {{ .Chart.AppVersion }} is watching: {{ .Values.watch.namespaces }}
+Model: {{ .Values.model.default }} ({{ .Values.model.llm }})
+
+{{- if and .Values.web.enabled (eq .Values.web.service.type "NodePort") }}
+UI:   http://<node-ip>:{{ .Values.web.service.nodePort }}    (k3s on your laptop: http://localhost:{{ .Values.web.service.nodePort }})
+{{- else if .Values.web.enabled }}
+UI:   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "firstcall.fullname" . }}-web 3000:{{ .Values.web.service.port }}
+{{- end }}
+API:  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "firstcall.fullname" . }}-api 8000:{{ .Values.api.service.port }}
+Diagnoses also appear on the workloads:  kubectl -n <ns> describe deploy <name>   (reason FirstCallDiagnosis)
+Alertmanager webhook: http://{{ include "firstcall.fullname" . }}-api.{{ .Release.Namespace }}.svc:{{ .Values.api.service.port }}/api/alertmanager

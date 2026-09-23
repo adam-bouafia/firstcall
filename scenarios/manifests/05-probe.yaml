@@ -1,0 +1,22 @@
+# Root cause: the app serves :80, the readiness probe checks :8080/healthz -> never Ready.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-api
+  namespace: firstcall-demo
+  annotations: {kubernetes.io/change-cause: "standardise health checks on :8080"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: catalog-api}}
+  template:
+    metadata: {labels: {app: catalog-api}}
+    spec:
+      containers:
+      - name: api
+        image: busybox:1.36
+        command: ["sh", "-c", "mkdir -p /www && echo ok > /www/healthz && echo 'catalog-api listening on :80' && httpd -f -v -p 80 -h /www"]
+        ports: [{containerPort: 80}]
+        readinessProbe:
+          httpGet: {path: /healthz, port: 8080}
+          periodSeconds: 5
+          failureThreshold: 3

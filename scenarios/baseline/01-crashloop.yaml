@@ -1,0 +1,27 @@
+# Healthy v2.3.0. The broken manifest (v2.3.1) "moves DB config to Vault" and drops DATABASE_URL.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-api
+  namespace: firstcall-demo
+  annotations: {kubernetes.io/change-cause: "deploy payments-api v2.3.0"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: payments-api}}
+  template:
+    metadata: {labels: {app: payments-api}}
+    spec:
+      containers:
+      - name: api
+        image: busybox:1.36
+        command: ["sh", "-c"]
+        args:
+        - |
+          echo "$(date -Iseconds) INFO  payments-api v2.3.0 starting"
+          echo "$(date -Iseconds) INFO  connecting to database"
+          if [ -z "$DATABASE_URL" ]; then echo "FATAL DATABASE_URL not set"; exit 1; fi
+          echo "$(date -Iseconds) INFO  ready"; sleep 3600
+        env:
+        - {name: LOG_LEVEL, value: info}
+        - {name: DATABASE_URL, value: "postgres://payments-db:5432/payments"}
+        resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {memory: 64Mi}}

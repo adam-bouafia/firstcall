@@ -1,0 +1,22 @@
+# Root cause: loads an unbounded "dataset" into memory with a 32Mi limit -> OOMKilled (exit 137).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-worker
+  namespace: firstcall-demo
+  annotations: {kubernetes.io/change-cause: "deploy report-worker v1.8: load dataset in memory for speed"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: report-worker}}
+  template:
+    metadata: {labels: {app: report-worker}}
+    spec:
+      containers:
+      - name: worker
+        image: busybox:1.36
+        command: ["sh", "-c"]
+        args:
+        - |
+          echo "report-worker: building monthly report, loading dataset into memory"
+          tail /dev/zero
+        resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {memory: 32Mi}}

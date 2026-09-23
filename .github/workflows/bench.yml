@@ -1,0 +1,55 @@
+name: benchmark
+
+# Every change to the prompt, collector or models re-proves the model advantage on Nebius Token Factory.
+# Needs repository secret NEBIUS_API_KEY. Optional repository variable BENCH_MIN_SCORE (default 0.60).
+
+on:
+  workflow_dispatch:
+    inputs:
+      repeats: {description: "repeats per scenario", default: "1"}
+  push:
+    branches: [main]
+    paths: ["backend/app/**", "bench/**", "scenarios/fixtures/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    env:
+      NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
+      FIRSTCALL_LLM: real
+      FIRSTCALL_SOURCE: fixtures
+    steps:
+      - uses: actions/checkout@v4
+      - name: skip without a key
+        if: env.NEBIUS_API_KEY == ''
+        run: echo "::notice::NEBIUS_API_KEY secret not set, benchmark skipped" && exit 0
+      - uses: actions/setup-python@v5
+        if: env.NEBIUS_API_KEY != ''
+        with: {python-version: "3.12", cache: pip, cache-dependency-path: backend/requirements.txt}
+      - name: run benchmark (Nebius models + cascade + rules floor)
+        if: env.NEBIUS_API_KEY != ''
+        run: |
+          pip install -q -r backend/requirements.txt
+          python bench/run_bench.py --provider nebius -m cascade -m rules -r ${{ inputs.repeats || '1' }}
+          cat bench/results/*.md >> $GITHUB_STEP_SUMMARY
+      - name: regression gate
+        if: env.NEBIUS_API_KEY != ''
+        env: {MIN: "${{ vars.BENCH_MIN_SCORE || '0.60' }}"}
+        run: |
+          python3 - <<'PY'
+          import glob, json, os, statistics, sys
+          rows = json.load(open(sorted(glob.glob("bench/results/*.json"))[-1]))
+          by = {}
+          for r in rows:
+              if not r.get("error") and r.get("score") is not None and r["model"] != "rules":
+                  by.setdefault(r["model"], []).append(r["score"])
+          best = max((statistics.mean(v), m) for m, v in by.items())
+          print(f"best model: {best[1]} score {best[0]:.2f} (min {os.environ['MIN']})")
+          sys.exit(0 if best[0] >= float(os.environ["MIN"]) else 1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: env.NEBIUS_API_KEY != ''
+        with: {name: bench-results, path: bench/results/}

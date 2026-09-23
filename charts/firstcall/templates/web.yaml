@@ -1,0 +1,51 @@
+{{- if .Values.web.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "firstcall.fullname" . }}-web
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{- include "firstcall.selector" . | nindent 6 }}
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      labels: {{- include "firstcall.selector" . | nindent 8 }}
+        app.kubernetes.io/component: web
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {runAsNonRoot: true, runAsUser: 1000, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: web
+          image: {{ include "firstcall.webImage" . }}
+          imagePullPolicy: {{ .Values.image.web.pullPolicy }}
+          env:
+            - name: FIRSTCALL_API_URL
+              value: http://{{ include "firstcall.fullname" . }}-api:{{ .Values.api.service.port }}
+          ports: [{name: http, containerPort: 3000}]
+          readinessProbe: {httpGet: {path: /, port: http}, periodSeconds: 10}
+          resources: {{- toYaml .Values.web.resources | nindent 12 }}
+          securityContext: {allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "firstcall.fullname" . }}-web
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  type: {{ .Values.web.service.type }}
+  selector: {{- include "firstcall.selector" . | nindent 4 }}
+    app.kubernetes.io/component: web
+  ports:
+    - name: http
+      port: {{ .Values.web.service.port }}
+      targetPort: http
+      {{- if and (eq .Values.web.service.type "NodePort") .Values.web.service.nodePort }}
+      nodePort: {{ .Values.web.service.nodePort }}
+      {{- end }}
+{{- end }}

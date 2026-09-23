@@ -1,0 +1,157 @@
+{
+  "reason": "NoEndpoints",
+  "age": "1m",
+  "snapshot": {
+    "namespace": "firstcall-demo",
+    "pod": "svc/orders",
+    "phase": "NoEndpoints",
+    "workload": "service/orders",
+    "pod_summary": {
+      "service": {
+        "selector": {
+          "app": "orders"
+        },
+        "ports": [
+          {
+            "app_protocol": null,
+            "name": null,
+            "node_port": null,
+            "port": 80,
+            "protocol": "TCP",
+            "target_port": 80
+          }
+        ]
+      }
+    },
+    "container_statuses": [],
+    "events": [],
+    "logs": {},
+    "metrics": {},
+    "related": {
+      "pods_in_namespace": [
+        {
+          "name": "catalog-api-5679bc645c-p4cf7",
+          "labels": {
+            "app": "catalog-api",
+            "pod-template-hash": "5679bc645c"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "catalog-api-58fffc4469-vphrm",
+          "labels": {
+            "app": "catalog-api",
+            "pod-template-hash": "58fffc4469"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "checkout-web-6cf8659ccf-9hggq",
+          "labels": {
+            "app": "checkout-web",
+            "pod-template-hash": "6cf8659ccf"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "checkout-web-ff68578f7-7nmcx",
+          "labels": {
+            "app": "checkout-web",
+            "pod-template-hash": "ff68578f7"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "ledger-db-7b96cc4f68-5s82q",
+          "labels": {
+            "app": "ledger-db",
+            "pod-template-hash": "7b96cc4f68"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "ml-batch-78c9b6c885-bbv5d",
+          "labels": {
+            "app": "ml-batch",
+            "pod-template-hash": "78c9b6c885"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "notify-svc-5f5b786b44-k4x8g",
+          "labels": {
+            "app": "notify-svc",
+            "pod-template-hash": "5f5b786b44"
+          },
+          "phase": "Pending"
+        },
+        {
+          "name": "orders-5f5d7b65f7-9mnvv",
+          "labels": {
+            "app": "orders-api",
+            "pod-template-hash": "5f5d7b65f7"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "orders-5f5d7b65f7-zbxnn",
+          "labels": {
+            "app": "orders-api",
+            "pod-template-hash": "5f5d7b65f7"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "payments-api-6bc9c4cdc5-p9zgr",
+          "labels": {
+            "app": "payments-api",
+            "pod-template-hash": "6bc9c4cdc5"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "payments-api-b6cd797cf-7qxcz",
+          "labels": {
+            "app": "payments-api",
+            "pod-template-hash": "b6cd797cf"
+          },
+          "phase": "Running"
+        },
+        {
+          "name": "report-worker-cd59f486-th2wx",
+          "labels": {
+            "app": "report-worker",
+            "pod-template-hash": "cd59f486"
+          },
+          "phase": "Running"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "category": "ServiceSelector",
+    "keywords": [
+      [
+        "selector",
+        "label"
+      ],
+      [
+        "orders-api"
+      ]
+    ],
+    "command_any": [
+      "get endpoints",
+      "get ep",
+      "get pods --show-labels",
+      "get pods -l",
+      "describe svc",
+      "describe service",
+      "get endpointslice"
+    ],
+    "remediation_any": [
+      "patch service",
+      "patch svc",
+      "patch services"
+    ]
+  }
+}

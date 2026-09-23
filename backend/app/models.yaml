@@ -1,0 +1,122 @@
+# Provider + model registry. Any OpenAI-compatible endpoint works.
+# `make models PROVIDER=<name>` lists the IDs a provider actually serves.
+# Prices: USD per 1M tokens (0 for local). Confirm Token Factory prices before quoting them.
+
+default: qwen3-30b             # overridden by FIRSTCALL_DEFAULT_MODEL in .env
+
+providers:
+  nebius:                       # the hackathon engine
+    base_url: https://api.tokenfactory.nebius.com/v1/
+    api_key_env: NEBIUS_API_KEY
+  ollama:                       # free, local, open weights on your own machine
+    base_url: http://localhost:11434/v1/
+    base_url_env: OLLAMA_BASE_URL
+    api_key: ollama             # Ollama ignores it, the SDK needs something
+    timeout: 300                # CPU inference is slow; be patient
+  openrouter:                   # cheap/free hosted open models for testing
+    base_url: https://openrouter.ai/api/v1/
+    api_key_env: OPENROUTER_API_KEY
+  groq:                         # free tier: gpt-oss-120b/20b, 1k req/day, 8k tokens/min
+    base_url: https://api.groq.com/openai/v1/
+    api_key_env: GROQ_API_KEY
+  cerebras:                     # $5 trial credit, 1M tokens/day, 5 req/min
+    base_url: https://api.cerebras.ai/v1/
+    api_key_env: CEREBRAS_API_KEY
+  custom:                       # vLLM, LM Studio, llama.cpp server, ...
+    base_url_env: CUSTOM_LLM_BASE_URL
+    api_key_env: CUSTOM_LLM_API_KEY
+
+models:
+  # ---------- Nebius Token Factory (open-weight, hosted) ----------
+  qwen3-235b:
+    provider: nebius
+    id: Qwen/Qwen3-235B-A22B-Instruct-2507
+    label: Qwen3 235B A22B
+    role: quality
+    price_in: 0.20
+    price_out: 0.60
+  qwen3-30b:
+    provider: nebius
+    id: Qwen/Qwen3-30B-A3B-Instruct-2507
+    label: Qwen3 30B A3B
+    role: speed
+    price_in: 0.10
+    price_out: 0.30
+  gpt-oss-120b:
+    provider: nebius
+    id: openai/gpt-oss-120b
+    label: gpt-oss-120b
+    role: reasoning
+    price_in: 0.15
+    price_out: 0.60
+  nemotron-nano:
+    provider: nebius
+    id: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B
+    label: Nemotron 3 Nano 30B A3B
+    role: cheapest
+    price_in: 0.06
+    price_out: 0.24
+    max_tokens: 3000     # it reasons before answering; at 1500 it gets cut mid-<think> and returns Other
+  gemma3-27b:
+    provider: nebius
+    id: google/gemma-3-27b-it
+    label: Gemma 3 27B
+    role: small
+    price_in: 0.10
+    price_out: 0.30
+
+  # ---------- Local via Ollama (free; `ollama pull <id>` first) ----------
+  local-qwen2.5-7b:
+    provider: ollama
+    id: qwen2.5:7b-instruct
+    label: Qwen2.5 7B (local)
+    role: local
+    json_mode: true
+    price_in: 0
+    price_out: 0
+  local-qwen2.5-3b:
+    provider: ollama
+    id: qwen2.5:3b-instruct
+    label: Qwen2.5 3B (local, low RAM)
+    role: local
+    json_mode: true
+    price_in: 0
+    price_out: 0
+  local-llama3.1-8b:
+    provider: ollama
+    id: llama3.1:8b
+    label: Llama 3.1 8B (local)
+    role: local
+    json_mode: true
+    price_in: 0
+    price_out: 0
+
+  # ---------- Free/cheap fallbacks (set AUTO_INVESTIGATE=0 on Groq: 8k tokens/min) ----------
+  groq-gpt-oss-120b:
+    provider: groq
+    id: openai/gpt-oss-120b
+    label: gpt-oss-120b (Groq free)
+    role: fallback
+    price_in: 0
+    price_out: 0
+  cerebras-gpt-oss-120b:
+    provider: cerebras
+    id: gpt-oss-120b
+    label: gpt-oss-120b (Cerebras trial)
+    role: fallback
+    price_in: 0
+    price_out: 0
+
+  # ---------- OpenRouter (set the id to any model you have access to) ----------
+  or-qwen3-30b:
+    provider: openrouter
+    id: qwen/qwen3-30b-a3b-instruct-2507
+    label: Qwen3 30B A3B (OpenRouter)
+    role: speed
+    price_in: 0.10
+    price_out: 0.30
+
+cascade:
+  fast: qwen3-30b
+  strong: qwen3-235b
+  threshold: 0.75

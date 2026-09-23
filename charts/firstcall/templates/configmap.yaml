@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "firstcall.fullname" . }}-config
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+data:
+  FIRSTCALL_LLM: {{ .Values.model.llm | quote }}
+  FIRSTCALL_DEFAULT_MODEL: {{ .Values.model.default | quote }}
+  FIRSTCALL_SOURCE: cluster
+  FIRSTCALL_NAMESPACES: {{ .Values.watch.namespaces | quote }}
+  FIRSTCALL_WATCH_INTERVAL: {{ .Values.watch.interval | quote }}
+  FIRSTCALL_AUTO_DIAGNOSE: {{ .Values.watch.autoDiagnose | quote }}
+  FIRSTCALL_AUTO_INVESTIGATE: {{ .Values.watch.autoInvestigate | quote }}
+  FIRSTCALL_RESOLVE_AFTER: {{ .Values.watch.resolveAfter | quote }}
+  FIRSTCALL_WRITE_EVENTS: {{ .Values.writeEvents | quote }}
+  FIRSTCALL_REMEDIATION: {{ ternary "approve" "off" .Values.remediation.enabled | quote }}
+  FIRSTCALL_DB: /data/firstcall.db
+  FIRSTCALL_ALERT_MODE: {{ .Values.alerting.mode | quote }}
+  FIRSTCALL_TIMEZONE: {{ .Values.alerting.timezone | quote }}
+  FIRSTCALL_BUSINESS_START: {{ .Values.alerting.businessStart | quote }}
+  FIRSTCALL_BUSINESS_END: {{ .Values.alerting.businessEnd | quote }}
+  FIRSTCALL_BUSINESS_DAYS: {{ .Values.alerting.businessDays | quote }}
+  FIRSTCALL_WEB_SEARCH: {{ .Values.webSearch | quote }}
+  FIRSTCALL_VOICE_ALERTS: {{ .Values.voiceAlerts | quote }}
+  TELEGRAM_CHAT_IDS: {{ .Values.telegram.chatIds | quote }}
+  TELEGRAM_COMMANDS: {{ .Values.telegram.commands | quote }}
+  {{- with .Values.ollamaBaseUrl }}
+  OLLAMA_BASE_URL: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.publicUrl }}
+  FIRSTCALL_PUBLIC_URL: {{ . | quote }}
+  {{- end }}
+  {{- range $k, $v := .Values.extraEnv }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}

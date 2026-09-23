@@ -1,0 +1,18 @@
+# Root cause: transposed digits in the image tag: busybox:1.63 does not exist (meant 1.36).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-web
+  namespace: firstcall-demo
+  annotations: {kubernetes.io/change-cause: "bump busybox to 1.63"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: checkout-web}}
+  template:
+    metadata: {labels: {app: checkout-web}}
+    spec:
+      containers:
+      - name: web
+        image: busybox:1.63
+        command: ["sh", "-c", "mkdir -p /www && echo checkout > /www/index.html && httpd -f -p 80 -h /www"]
+        ports: [{containerPort: 80}]

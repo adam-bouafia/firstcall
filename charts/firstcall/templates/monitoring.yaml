@@ -1,0 +1,75 @@
+{{- if .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "firstcall.fullname" . }}
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+    {{- with .Values.metrics.serviceMonitor.labels }}{{ toYaml . | nindent 4 }}{{ end }}
+spec:
+  selector:
+    matchLabels: {{- include "firstcall.selector" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  endpoints:
+    - port: http
+      path: /metrics/
+      interval: {{ .Values.metrics.serviceMonitor.interval }}
+{{- end }}
+{{- if .Values.metrics.prometheusRule.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "firstcall.fullname" . }}
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+    {{- with .Values.metrics.prometheusRule.labels }}{{ toYaml . | nindent 4 }}{{ end }}
+spec:
+  groups:
+    - name: firstcall.self
+      rules:
+        - alert: FirstCallScansFailing
+          expr: increase(firstcall_scans_total{result="error"}[5m]) > 2
+          for: 2m
+          labels: {severity: warning}
+          annotations: {summary: "FirstCall cannot read the cluster (check RBAC / API server)"}
+        - alert: FirstCallModelErrors
+          expr: increase(firstcall_errors_total[10m]) > 3
+          for: 1m
+          labels: {severity: warning}
+          annotations: {summary: "FirstCall diagnoses are failing (model provider or quota)"}
+        - alert: FirstCallIncidentOpenLong
+          expr: firstcall_incidents_open > 0
+          for: 30m
+          labels: {severity: info}
+          annotations: {summary: "{{`{{ $value }}`}} incident(s) open for more than 30 minutes"}
+    {{- if .Values.metrics.prometheusRule.fastPodAlerts }}
+    - name: firstcall.workloads
+      rules:
+        - alert: FirstCallPodWaiting
+          expr: max by (namespace, pod, reason) (kube_pod_container_status_waiting_reason{reason=~"CrashLoopBackOff|ImagePullBackOff|ErrImagePull|CreateContainerConfigError"}) > 0
+          for: 1m
+          labels: {severity: warning}
+          annotations: {summary: "{{`{{ $labels.pod }}`}} is {{`{{ $labels.reason }}`}}"}
+        - alert: FirstCallPodOOMKilled
+          expr: max by (namespace, pod) (kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}) > 0
+          for: 1m
+          labels: {severity: warning}
+          annotations: {summary: "{{`{{ $labels.pod }}`}} was OOMKilled"}
+        - alert: FirstCallPodPending
+          expr: max by (namespace, pod) (kube_pod_status_phase{phase="Pending"}) > 0
+          for: 2m
+          labels: {severity: warning}
+          annotations: {summary: "{{`{{ $labels.pod }}`}} stuck Pending"}
+    {{- end }}
+{{- end }}
+{{- if .Values.dashboard.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "firstcall.fullname" . }}-dashboard
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+    {{- with .Values.dashboard.labels }}{{ toYaml . | nindent 4 }}{{ end }}
+data:
+  firstcall.json: |-
+{{ .Files.Get "dashboards/firstcall.json" | indent 4 }}
+{{- end }}

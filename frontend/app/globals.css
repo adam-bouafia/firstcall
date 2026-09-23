@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Light is the default palette; dark is applied by the OS preference or the header toggle.
+   Every colour is a token, so the whole console flips with one attribute. */
+:root {
+  --bg: #f6f7f8;
+  --panel: #ffffff;
+  --code: #eef1f3;
+  --line: #d8dee3;
+  --muted: #5d6b73;
+  --fg: #16212a;
+  --accent: #0e8f7e;
+  --on-accent: #ffffff;
+  --ok: #157f3c;
+  --warn: #9a5b06;
+  --bad: #b3261e;
+  --info: #14608f;
+  --hover: rgba(16, 32, 40, .05);
+  --active: rgba(16, 32, 40, .09);
+  --shadow: 0 1px 2px rgba(16, 32, 40, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0e0d; --panel: #121716; --code: #0c1110; --line: #222b29; --muted: #8b9994; --fg: #e4ebe8;
+    --accent: #3ccfb8; --on-accent: #06201b; --ok: #6fd08c; --warn: #f0a64b; --bad: #f2837a; --info: #7fb2f0;
+    --hover: rgba(255, 255, 255, .05); --active: rgba(255, 255, 255, .09); --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0e0d; --panel: #121716; --code: #0c1110; --line: #222b29; --muted: #8b9994; --fg: #e4ebe8;
+  --accent: #3ccfb8; --on-accent: #06201b; --ok: #6fd08c; --warn: #f0a64b; --bad: #f2837a; --info: #7fb2f0;
+  --hover: rgba(255, 255, 255, .05); --active: rgba(255, 255, 255, .09); --shadow: none;
+}
+
+body { background: var(--bg); color: var(--fg); font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+.mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+.label { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.btn { border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 13px; background: transparent; color: inherit; }
+.btn:hover:not(:disabled) { background: var(--hover); }
+.btn:disabled { opacity: .5; }
+.btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+.hoverable:hover { background: var(--hover); }
+.selected { background: var(--active); }
+.chip-ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
+.chip-warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@keyframes pulse-dot { 50% { opacity: .3 } }
+.pulse { animation: pulse-dot 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }

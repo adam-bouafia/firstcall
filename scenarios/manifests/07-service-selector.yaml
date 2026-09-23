@@ -1,0 +1,23 @@
+# Root cause: pods are labelled app=orders-api, the Service selects app=orders -> 0 endpoints.
+# Nothing crashes. This is the one a keyword runbook cannot catch.
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: orders, namespace: firstcall-demo}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: orders-api}}
+  template:
+    metadata: {labels: {app: orders-api}}
+    spec:
+      containers:
+      - name: api
+        image: busybox:1.36
+        command: ["sh", "-c", "mkdir -p /www && echo orders > /www/index.html && httpd -f -p 80 -h /www"]
+        ports: [{containerPort: 80}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: orders, namespace: firstcall-demo}
+spec:
+  selector: {app: orders}
+  ports: [{port: 80, targetPort: 80}]

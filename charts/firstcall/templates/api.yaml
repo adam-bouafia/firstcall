@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "firstcall.fullname" . }}-api
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1                  # SQLite + in-process watcher: exactly one replica
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {{- include "firstcall.selector" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels: {{- include "firstcall.selector" . | nindent 8 }}
+        app.kubernetes.io/component: api
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "firstcall.serviceAccount" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, fsGroup: 65532, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: api
+          image: {{ include "firstcall.apiImage" . }}
+          imagePullPolicy: {{ .Values.image.api.pullPolicy }}
+          envFrom:
+            - configMapRef: {name: {{ include "firstcall.fullname" . }}-config}
+            - secretRef: {name: {{ include "firstcall.secretName" . }}}
+          ports: [{name: http, containerPort: 8000}]
+          readinessProbe: {httpGet: {path: /health, port: http}, periodSeconds: 10}
+          livenessProbe: {httpGet: {path: /health, port: http}, periodSeconds: 30, failureThreshold: 5}
+          resources: {{- toYaml .Values.api.resources | nindent 12 }}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          volumeMounts:
+            - {name: data, mountPath: /data}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim: {claimName: {{ include "firstcall.fullname" . }}-data}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - {name: tmp, emptyDir: {}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "firstcall.fullname" . }}-api
+  labels: {{- include "firstcall.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  type: {{ .Values.api.service.type }}
+  selector: {{- include "firstcall.selector" . | nindent 4 }}
+    app.kubernetes.io/component: api
+  ports: [{name: http, port: {{ .Values.api.service.port }}, targetPort: http}]

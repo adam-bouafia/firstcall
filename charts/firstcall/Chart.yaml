@@ -1,0 +1,10 @@
+apiVersion: v2
+name: firstcall
+description: Kubernetes incident first-responder on open-weight models (Nebius Token Factory, Ollama, any OpenAI-compatible API)
+type: application
+version: 0.3.0
+appVersion: "0.3.0"
+keywords: [kubernetes, incident, sre, llm, open-weight, observability]
+home: https://github.com/adam-bouafia/firstcall
+maintainers:
+  - name: Adam Bouafia

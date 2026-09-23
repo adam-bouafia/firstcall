@@ -1,0 +1,22 @@
+# Healthy v1.7: streams the dataset. The broken v1.8 loads it all into memory under a 32Mi limit.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-worker
+  namespace: firstcall-demo
+  annotations: {kubernetes.io/change-cause: "deploy report-worker v1.7 (streaming)"}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: report-worker}}
+  template:
+    metadata: {labels: {app: report-worker}}
+    spec:
+      containers:
+      - name: worker
+        image: busybox:1.36
+        command: ["sh", "-c"]
+        args:
+        - |
+          echo "report-worker v1.7: streaming monthly dataset in chunks"
+          sleep 3600
+        resources: {requests: {cpu: 10m, memory: 16Mi}, limits: {memory: 32Mi}}

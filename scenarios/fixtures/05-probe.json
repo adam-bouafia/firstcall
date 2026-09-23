@@ -1,0 +1,247 @@
+{
+  "reason": "NotReady",
+  "age": "1m",
+  "snapshot": {
+    "namespace": "firstcall-demo",
+    "pod": "catalog-api-58fffc4469-vphrm",
+    "phase": "Running",
+    "workload": "deployment/catalog-api",
+    "pod_summary": {
+      "node": "vm",
+      "service_account": "default",
+      "labels": {
+        "app": "catalog-api",
+        "pod-template-hash": "58fffc4469"
+      },
+      "containers": [
+        {
+          "name": "api",
+          "image": "busybox:1.36",
+          "command": [
+            "sh",
+            "-c",
+            "mkdir -p /www && echo ok > /www/healthz && echo 'catalog-api listening on :80' && httpd -f -v -p 80 -h /www"
+          ],
+          "args": null,
+          "ports": [
+            80
+          ],
+          "env_names": [],
+          "env_from": [],
+          "resources": {
+            "claims": null,
+            "limits": null,
+            "requests": null
+          },
+          "readiness_probe": {
+            "_exec": null,
+            "failure_threshold": 3,
+            "grpc": null,
+            "http_get": {
+              "host": null,
+              "http_headers": null,
+              "path": "/healthz",
+              "port": 8080,
+              "scheme": "HTTP"
+            },
+            "initial_delay_seconds": null,
+            "period_seconds": 5,
+            "success_threshold": 1,
+            "tcp_socket": null,
+            "termination_grace_period_seconds": null,
+            "timeout_seconds": 1
+          },
+          "liveness_probe": null
+        }
+      ],
+      "volumes": [
+        {
+          "name": "kube-api-access-7g5j9",
+          "projected": {
+            "default_mode": 420,
+            "sources": [
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": {
+                  "audience": null,
+                  "expiration_seconds": 3607,
+                  "path": "token"
+                }
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": {
+                  "items": [
+                    {
+                      "key": "ca.crt",
+                      "mode": null,
+                      "path": "ca.crt"
+                    }
+                  ],
+                  "name": "kube-root-ca.crt",
+                  "optional": null
+                },
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": {
+                  "items": [
+                    {
+                      "field_ref": {
+                        "api_version": "v1",
+                        "field_path": "metadata.namespace"
+                      },
+                      "mode": null,
+                      "path": "namespace",
+                      "resource_field_ref": null
+                    }
+                  ]
+                },
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              }
+            ]
+          }
+        }
+      ],
+      "conditions": [
+        {
+          "type": "PodReadyToStartContainers",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Initialized",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Ready",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [api]"
+        },
+        {
+          "type": "ContainersReady",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [api]"
+        },
+        {
+          "type": "PodScheduled",
+          "status": "True",
+          "reason": null,
+          "message": null
+        }
+      ]
+    },
+    "container_statuses": [
+      {
+        "name": "api",
+        "ready": false,
+        "restart_count": 0,
+        "state": "running"
+      }
+    ],
+    "events": [
+      {
+        "type": "Normal",
+        "reason": "Scheduled",
+        "message": "Successfully assigned firstcall-demo/catalog-api-58fffc4469-vphrm to vm",
+        "count": null
+      },
+      {
+        "type": "Normal",
+        "reason": "Pulled",
+        "message": "Container image \"busybox:1.36\" already present on machine",
+        "count": 1
+      },
+      {
+        "type": "Normal",
+        "reason": "Created",
+        "message": "Created container: api",
+        "count": 1
+      },
+      {
+        "type": "Normal",
+        "reason": "Started",
+        "message": "Started container api",
+        "count": 1
+      },
+      {
+        "type": "Warning",
+        "reason": "Unhealthy",
+        "message": "Readiness probe failed: Get \"http://10.42.0.228:8080/healthz\": dial tcp 10.42.0.228:8080: connect: connection refused",
+        "count": 17
+      }
+    ],
+    "logs": {
+      "api": "--- current ---\ncatalog-api listening on :80\n"
+    },
+    "metrics": {
+      "api": {
+        "cpu": "0",
+        "memory": "392Ki"
+      }
+    },
+    "related": {
+      "services": [],
+      "pvcs": [],
+      "recent_changes": {
+        "deployment": "catalog-api",
+        "current_revision": 2,
+        "current_deployed": "1m ago",
+        "history": [
+          {
+            "revision": 1,
+            "age": "1m",
+            "change_cause": "deploy catalog-api"
+          },
+          {
+            "revision": 2,
+            "age": "1m",
+            "change_cause": "standardise health checks on :8080"
+          }
+        ],
+        "previous_revision": 1,
+        "diff": [
+          "api: readinessProbe {'failureThreshold': 3, 'httpGet': {'path': '/healthz', 'port': 80, 'scheme': 'HTTP'}, 'periodSeconds': 5, 'successThreshold': 1, 'timeoutSeconds': 1} -> {'failureThreshold': 3, 'httpGet': {'path': '/healthz', 'port': 8080, 'scheme': 'HTTP'}, 'periodSeconds': 5, 'successThreshold': 1, 'timeoutSeconds': 1}"
+        ]
+      }
+    }
+  },
+  "expected": {
+    "category": "ProbeFailure",
+    "keywords": [
+      [
+        "8080"
+      ],
+      [
+        "80",
+        "port"
+      ]
+    ],
+    "command_any": [
+      "describe",
+      "get pod",
+      "patch",
+      "port-forward"
+    ],
+    "remediation_any": [
+      "rollout undo",
+      "patch"
+    ]
+  }
+}

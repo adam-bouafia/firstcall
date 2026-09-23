@@ -1,0 +1,108 @@
+# ---------------------------------------------------------------- images
+image:
+  api:
+    repository: ghcr.io/adam-bouafia/firstcall-backend
+    tag: ""            # defaults to .Chart.AppVersion
+    pullPolicy: IfNotPresent
+  web:
+    repository: ghcr.io/adam-bouafia/firstcall-frontend
+    tag: ""
+    pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# ---------------------------------------------------------------- model
+model:
+  llm: real                 # real | mock
+  default: qwen3-30b        # key from models.yaml, "cascade", or provider:model-id
+
+# Provider keys. Prefer an existing Secret in production:
+#   kubectl -n firstcall-system create secret generic firstcall-keys --from-literal=NEBIUS_API_KEY=...
+existingSecret: ""
+secrets:
+  NEBIUS_API_KEY: ""
+  GROQ_API_KEY: ""
+  CEREBRAS_API_KEY: ""
+  OPENROUTER_API_KEY: ""
+  SLACK_WEBHOOK_URL: ""
+  TELEGRAM_BOT_TOKEN: ""
+  TAVILY_API_KEY: ""
+  ELEVENLABS_API_KEY: ""
+ollamaBaseUrl: ""           # e.g. http://<host-ip>:11434/v1/
+
+# ---------------------------------------------------------------- behaviour
+watch:
+  namespaces: firstcall-demo   # comma list or "*" (all non-system namespaces)
+  interval: 15
+  autoDiagnose: true
+  autoInvestigate: 1           # read-only follow-up commands per new incident (0 = off)
+  resolveAfter: 2
+writeEvents: true              # post diagnoses as Kubernetes Events on the broken workload
+
+# ---------------------------------------------------------------- human-approved fixes
+remediation:
+  enabled: false               # true: a person can dry-run + approve a proposed fix (console / Telegram)
+  # RoleBindings are created in each namespace of watch.namespaces (they must exist before install).
+  # Verbs granted: patch/update Deployments (+scale), list ReplicaSets (rollout undo), patch Services.
+
+# ---------------------------------------------------------------- paging (Telegram / Slack)
+alerting:
+  mode: always                 # always (24/7) | offhours (weekdays 17:00-09:00 + weekends); changeable at runtime
+  timezone: Europe/Amsterdam
+  businessStart: "09:00"
+  businessEnd: "17:00"
+  businessDays: mon-fri
+webSearch: low-confidence      # off | low-confidence | always (needs secrets.TAVILY_API_KEY)
+voiceAlerts: false             # Telegram voice note (needs secrets.ELEVENLABS_API_KEY)
+telegram:
+  chatIds: ""                  # comma separated; send /start to the bot to get yours
+  commands: true               # /status /incidents /mode + inline buttons (one poller per bot token!)
+publicUrl: ""                  # link used in Slack messages
+extraEnv: {}
+
+# ---------------------------------------------------------------- security
+rbac:
+  create: true
+serviceAccount:
+  create: true
+  name: ""
+
+# ---------------------------------------------------------------- storage
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: ""             # "" = cluster default (local-path on k3s)
+
+# ---------------------------------------------------------------- services
+api:
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests: {cpu: 50m, memory: 128Mi}
+    limits: {memory: 512Mi}
+web:
+  enabled: true
+  service:
+    type: NodePort             # k3s/kind: open http://<node-ip>:30300
+    port: 3000
+    nodePort: 30300
+  resources:
+    requests: {cpu: 20m, memory: 96Mi}
+    limits: {memory: 256Mi}
+
+# ---------------------------------------------------------------- monitoring (Prometheus Operator CRDs)
+metrics:
+  serviceMonitor:
+    enabled: false
+    interval: 15s
+    labels: {}
+  prometheusRule:
+    enabled: false
+    labels: {}
+    # Fast alerts on the demo namespace so Alertmanager -> FirstCall fires in ~1 min
+    # (kube-prometheus-stack's KubePodCrashLooping waits 15 min).
+    fastPodAlerts: true
+dashboard:
+  enabled: false               # Grafana sidecar picks up ConfigMaps labelled grafana_dashboard=1
+  labels:
+    grafana_dashboard: "1"

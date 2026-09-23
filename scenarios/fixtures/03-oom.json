@@ -1,0 +1,237 @@
+{
+  "reason": "OOMKilled",
+  "age": "1m",
+  "snapshot": {
+    "namespace": "firstcall-demo",
+    "pod": "report-worker-cd59f486-th2wx",
+    "phase": "Running",
+    "workload": "deployment/report-worker",
+    "pod_summary": {
+      "node": "vm",
+      "service_account": "default",
+      "labels": {
+        "app": "report-worker",
+        "pod-template-hash": "cd59f486"
+      },
+      "containers": [
+        {
+          "name": "worker",
+          "image": "busybox:1.36",
+          "command": [
+            "sh",
+            "-c"
+          ],
+          "args": [
+            "echo \"report-worker: building monthly report, loading dataset into memory\"\ntail /dev/zero\n"
+          ],
+          "ports": [],
+          "env_names": [],
+          "env_from": [],
+          "resources": {
+            "claims": null,
+            "limits": {
+              "memory": "32Mi"
+            },
+            "requests": {
+              "cpu": "10m",
+              "memory": "16Mi"
+            }
+          },
+          "readiness_probe": null,
+          "liveness_probe": null
+        }
+      ],
+      "volumes": [
+        {
+          "name": "kube-api-access-8k6fw",
+          "projected": {
+            "default_mode": 420,
+            "sources": [
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": {
+                  "audience": null,
+                  "expiration_seconds": 3607,
+                  "path": "token"
+                }
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": {
+                  "items": [
+                    {
+                      "key": "ca.crt",
+                      "mode": null,
+                      "path": "ca.crt"
+                    }
+                  ],
+                  "name": "kube-root-ca.crt",
+                  "optional": null
+                },
+                "downward_api": null,
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              },
+              {
+                "cluster_trust_bundle": null,
+                "config_map": null,
+                "downward_api": {
+                  "items": [
+                    {
+                      "field_ref": {
+                        "api_version": "v1",
+                        "field_path": "metadata.namespace"
+                      },
+                      "mode": null,
+                      "path": "namespace",
+                      "resource_field_ref": null
+                    }
+                  ]
+                },
+                "pod_certificate": null,
+                "secret": null,
+                "service_account_token": null
+              }
+            ]
+          }
+        }
+      ],
+      "conditions": [
+        {
+          "type": "PodReadyToStartContainers",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Initialized",
+          "status": "True",
+          "reason": null,
+          "message": null
+        },
+        {
+          "type": "Ready",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [worker]"
+        },
+        {
+          "type": "ContainersReady",
+          "status": "False",
+          "reason": "ContainersNotReady",
+          "message": "containers with unready status: [worker]"
+        },
+        {
+          "type": "PodScheduled",
+          "status": "True",
+          "reason": null,
+          "message": null
+        }
+      ]
+    },
+    "container_statuses": [
+      {
+        "name": "worker",
+        "ready": false,
+        "restart_count": 3,
+        "state": "waiting",
+        "reason": "CrashLoopBackOff",
+        "message": "back-off 40s restarting failed container=worker pod=report-worker-cd59f486-th2wx_firstcall-demo(376fa969-0ff4-4527-b04e-7e2a4446de69)",
+        "last_terminated": {
+          "reason": "OOMKilled",
+          "exit_code": 137
+        }
+      }
+    ],
+    "events": [
+      {
+        "type": "Normal",
+        "reason": "Scheduled",
+        "message": "Successfully assigned firstcall-demo/report-worker-cd59f486-th2wx to vm",
+        "count": null
+      },
+      {
+        "type": "Normal",
+        "reason": "Pulled",
+        "message": "Container image \"busybox:1.36\" already present on machine",
+        "count": 4
+      },
+      {
+        "type": "Normal",
+        "reason": "Created",
+        "message": "Created container: worker",
+        "count": 4
+      },
+      {
+        "type": "Normal",
+        "reason": "Started",
+        "message": "Started container worker",
+        "count": 4
+      },
+      {
+        "type": "Warning",
+        "reason": "BackOff",
+        "message": "Back-off restarting failed container worker in pod report-worker-cd59f486-th2wx_firstcall-demo(376fa969-0ff4-4527-b04e-7e2a4446de69)",
+        "count": 8
+      }
+    ],
+    "logs": {
+      "worker": "--- previous ---\nreport-worker: building monthly report, loading dataset into memory\nKilled\n\n--- current ---\nreport-worker: building monthly report, loading dataset into memory\nKilled\n"
+    },
+    "metrics": {},
+    "related": {
+      "services": [],
+      "pvcs": [],
+      "recent_changes": {
+        "deployment": "report-worker",
+        "current_revision": 2,
+        "current_deployed": "1m ago",
+        "history": [
+          {
+            "revision": 1,
+            "age": "1m",
+            "change_cause": "deploy report-worker v1.7 (streaming)"
+          },
+          {
+            "revision": 2,
+            "age": "1m",
+            "change_cause": "deploy report-worker v1.8: load dataset in memory for speed"
+          }
+        ],
+        "previous_revision": 1,
+        "diff": [
+          "worker: args changed; removed ['echo \"report-worker v1.7: streaming monthly dataset in chunks\"', 'sleep 3600'] added ['echo \"report-worker: building monthly report, loading dataset into memory\"', 'tail /dev/zero']"
+        ]
+      }
+    }
+  },
+  "expected": {
+    "category": "OOMKilled",
+    "keywords": [
+      [
+        "memory",
+        "64Mi",
+        "limit"
+      ],
+      [
+        "OOM",
+        "137"
+      ]
+    ],
+    "command_any": [
+      "describe",
+      "top",
+      "set resources",
+      "get pod"
+    ],
+    "remediation_any": [
+      "rollout undo",
+      "set resources"
+    ]
+  }
+}
