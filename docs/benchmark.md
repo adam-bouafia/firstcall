@@ -91,12 +91,11 @@ cost. Say "escalation rate was zero on these scenarios", not a percentage.
 
 Two, not the whole catalogue. The claim is *"open weights you can host match the closed model
 a team would actually be using"* — one flagship-tier reference proves or disproves it. Adding
-five models from one vendor changes the subject to vendor-internal ranking and buys nothing
-a judge asked for.
+five models from one vendor changes the subject to vendor-internal ranking.
 
 The second one is worth having for a different reason: pick the **cheapest** closed model too.
 Your headline is cost as much as accuracy ($0.26 per 1000 incidents), so you want to know
-what the cheap closed option costs on the identical scenarios *before* a judge asks. If it is
+what the cheap closed option costs on the identical scenarios. If it is
 also cheap, say so and fall back on the privacy argument, which no price beats.
 
 ```bash

@@ -5,7 +5,7 @@
 default: qwen3-30b             # overridden by FIRSTCALL_DEFAULT_MODEL in .env
 
 providers:
-  nebius:                       # the hackathon engine
+  nebius:                       # default engine
     base_url: https://api.tokenfactory.nebius.com/v1/
     api_key_env: NEBIUS_API_KEY
   ollama:                       # free, local, open weights on your own machine

@@ -1,5 +1,5 @@
 """Write hand-made fixtures that mirror scenarios/manifests. Replace them with real
-captures on the day: `make capture` (scripts/capture_fixtures.py) keeps the `expected` block."""
+captures: `make capture` (scripts/capture_fixtures.py) keeps the `expected` block."""
 import json
 from pathlib import Path
 

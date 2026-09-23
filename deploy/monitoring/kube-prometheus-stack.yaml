@@ -86,5 +86,5 @@ grafana:
       searchNamespace: ALL
   grafana.ini:
     auth.anonymous:
-      enabled: true               # viewers (judges) can open the dashboard without logging in
+      enabled: true               # demo cluster only: anyone can view dashboards. Disable on a shared cluster
       org_role: Viewer

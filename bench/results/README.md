@@ -4,7 +4,7 @@ One row per model × scenario × repeat. These are the runs cited in `docs/bench
 
 | run | what it is |
 |---|---|
-| `20260923-134811.*` | head-to-head: 6 open models + keyword-rules baseline + **Claude Sonnet 5**, 8 scenarios, 1 repeat. The comparison table in the pitch. |
+| `20260923-134811.*` | head-to-head: 6 open models + keyword-rules baseline + **Claude Sonnet 5**, 8 scenarios, 1 repeat. The comparison table in `docs/benchmark.md`. |
 | `20260923-131845.*` | open models only, 8 scenarios × **3 repeats**. The stability check — quote this one for per-model scores. |
 
 Columns: `score`, `comparable`, `category_ok`, `keyword_score`, `command_ok`, `fix_ok`,
