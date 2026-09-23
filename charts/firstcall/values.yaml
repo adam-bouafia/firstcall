@@ -31,7 +31,8 @@ ollamaBaseUrl: ""           # e.g. http://<host-ip>:11434/v1/
 
 # ---------------------------------------------------------------- behaviour
 watch:
-  namespaces: firstcall-demo   # comma list or "*" (all non-system namespaces)
+  namespaces: "*"              # comma list, or "*" = every namespace except kube-*, this release's and `exclude`
+  exclude: ""                  # with "*": more namespaces to skip, comma list (e.g. "monitoring,cert-manager")
   interval: 15
   autoDiagnose: true
   autoInvestigate: 1           # read-only follow-up commands per new incident (0 = off)
@@ -41,7 +42,8 @@ writeEvents: true              # post diagnoses as Kubernetes Events on the brok
 # ---------------------------------------------------------------- human-approved fixes
 remediation:
   enabled: false               # true: a person can dry-run + approve a proposed fix (console / Telegram)
-  # RoleBindings are created in each namespace of watch.namespaces (they must exist before install).
+  # RoleBindings are created in each namespace of watch.namespaces (they must exist before install),
+  # so remediation needs an explicit list, not "*". Only enable it behind an authenticated console (SECURITY.md).
   # Verbs granted: patch/update Deployments (+scale), list ReplicaSets (rollout undo), patch Services.
 
 # ---------------------------------------------------------------- paging (Telegram / Slack)
@@ -65,6 +67,16 @@ rbac:
 serviceAccount:
   create: true
   name: ""
+# Pod security contexts. OpenShift assigns its own UIDs: set both runAsUser fields to null there.
+podSecurityContext:
+  api: {runAsNonRoot: true, runAsUser: 65532, fsGroup: 65532, seccompProfile: {type: RuntimeDefault}}
+  web: {runAsNonRoot: true, runAsUser: 1000, seccompProfile: {type: RuntimeDefault}}
+
+# ---------------------------------------------------------------- scheduling (both pods)
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
 
 # ---------------------------------------------------------------- storage
 persistence:
@@ -83,9 +95,16 @@ api:
 web:
   enabled: true
   service:
-    type: NodePort             # k3s/kind: open http://<node-ip>:30300
+    type: ClusterIP            # NodePort for a lab cluster (make install sets it), or use the Ingress below
     port: 3000
-    nodePort: 30300
+    nodePort: 30300            # only used with type NodePort
+  # The console has no login: put authentication in front of it (oauth2-proxy, ingress auth). See SECURITY.md.
+  ingress:
+    enabled: false
+    className: ""              # e.g. nginx, traefik
+    annotations: {}
+    host: firstcall.example.com
+    tls: []                    # [{secretName: firstcall-tls, hosts: [firstcall.example.com]}]
   resources:
     requests: {cpu: 20m, memory: 96Mi}
     limits: {memory: 256Mi}

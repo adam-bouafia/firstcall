@@ -17,12 +17,18 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       serviceAccountName: {{ include "firstcall.serviceAccount" . }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets: {{- toYaml . | nindent 8 }}
       {{- end }}
-      securityContext: {runAsNonRoot: true, runAsUser: 65532, fsGroup: 65532, seccompProfile: {type: RuntimeDefault}}
+      {{- with .Values.podSecurityContext.api }}
+      securityContext: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "firstcall.scheduling" . | nindent 6 }}
       containers:
         - name: api
           image: {{ include "firstcall.apiImage" . }}

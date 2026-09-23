@@ -1,7 +1,9 @@
 FirstCall {{ .Chart.AppVersion }} is watching: {{ .Values.watch.namespaces }}
 Model: {{ .Values.model.default }} ({{ .Values.model.llm }})
 
-{{- if and .Values.web.enabled (eq .Values.web.service.type "NodePort") }}
+{{- if and .Values.web.enabled .Values.web.ingress.enabled }}
+UI:   http{{ if .Values.web.ingress.tls }}s{{ end }}://{{ .Values.web.ingress.host }}    (no built-in login: see SECURITY.md)
+{{- else if and .Values.web.enabled (eq .Values.web.service.type "NodePort") }}
 UI:   http://<node-ip>:{{ .Values.web.service.nodePort }}    (k3s on your laptop: http://localhost:{{ .Values.web.service.nodePort }})
 {{- else if .Values.web.enabled }}
 UI:   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "firstcall.fullname" . }}-web 3000:{{ .Values.web.service.port }}

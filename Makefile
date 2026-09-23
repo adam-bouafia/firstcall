@@ -6,7 +6,7 @@ PROVIDER ?= nebius
 S ?= 01-crashloop
 API_URL ?= http://localhost:8000
 NS ?= firstcall-system
-TAG ?= 0.3.0
+TAG ?= 0.4.0
 REGISTRY ?= ghcr.io/adam-bouafia
 # podman on Fedora, docker elsewhere
 OCI ?= $(shell command -v podman >/dev/null && echo podman || echo docker)
@@ -28,7 +28,7 @@ env:
 	@test -f .env || (cp .env.example .env && echo "created .env -> add NEBIUS_API_KEY")
 
 # ---------------------------------------------------------------- cluster
-cluster:           ## k3s on this machine (no Docker) + the 8 broken scenarios
+cluster:           ## k3s on this machine (no Docker) + the broken scenarios
 	./scripts/setup-k3s.sh
 
 cluster-kind:      ## alternative: kind (needs Docker/Podman; what CI uses)
@@ -37,7 +37,7 @@ cluster-kind:      ## alternative: kind (needs Docker/Podman; what CI uses)
 cluster-stop:      ## stop k3s to free RAM/CPU (start again: sudo systemctl start k3s)
 	sudo systemctl stop k3s
 
-scenarios:         ## healthy baseline, then the 8 broken changes
+scenarios:         ## healthy baseline, then the broken changes
 	./scripts/break.sh all
 
 reset:             ## wipe the demo namespace and break everything again
@@ -79,14 +79,18 @@ images:            ## build both images locally ($(OCI))
 images-k3s: images ## build and import into k3s (no registry needed)
 	REGISTRY=$(REGISTRY) TAG=$(TAG) OCI=$(OCI) ./scripts/import-images.sh
 
-install:           ## helm install FirstCall (key from .env), UI on http://localhost:30300
+install:           ## lab install: helm install FirstCall on this cluster (keys from .env), UI on http://localhost:30300
 	@./scripts/preflight-install.sh
-	@set -a; source .env; set +a; \
+	@NS=$(NS) SECRET=firstcall-env-keys ./scripts/create-secret.sh
+	@set -a; source .env; set +a; ns=$${FIRSTCALL_NAMESPACES:-firstcall-demo}; \
 	helm upgrade --install firstcall charts/firstcall -n $(NS) --create-namespace \
 	  --set image.api.tag=$(TAG) --set image.web.tag=$(TAG) \
+	  --set existingSecret=firstcall-env-keys \
+	  --set-string podAnnotations.firstcall/keys-hash=$$(kubectl -n $(NS) get secret firstcall-env-keys -o jsonpath='{.data}' | sha256sum | cut -c1-16) \
+	  --set-string watch.namespaces="$${ns//,/\\,}" \
+	  --set web.service.type=NodePort \
 	  --set model.default=$${FIRSTCALL_DEFAULT_MODEL:-qwen3-30b} \
-	  --set secrets.NEBIUS_API_KEY=$${NEBIUS_API_KEY} --set secrets.GROQ_API_KEY=$${GROQ_API_KEY} \
-	  --set secrets.TELEGRAM_BOT_TOKEN=$${TELEGRAM_BOT_TOKEN} --set-string telegram.chatIds="$${TELEGRAM_CHAT_IDS}" \
+	  --set-string telegram.chatIds="$${TELEGRAM_CHAT_IDS//,/\\,}" \
 	  --set alerting.mode=$${FIRSTCALL_ALERT_MODE:-always} \
 	  --set remediation.enabled=$$( [ "$${FIRSTCALL_REMEDIATION:-off}" = approve ] && echo true || echo false) \
 	  --set metrics.serviceMonitor.enabled=$$(kubectl get crd servicemonitors.monitoring.coreos.com >/dev/null 2>&1 && echo true || echo false) \
@@ -132,7 +136,7 @@ capture:           ## record the live broken cluster into scenarios/fixtures
 bench:             ## benchmark on fixtures: make bench PROVIDER=nebius
 	$(ACT) set -a; source .env; set +a; $(PY) bench/run_bench.py -r 3 --provider $(PROVIDER) -m cascade -m rules
 
-bench-vs-closed:   ## open models vs GPT/Claude on the same scenarios (uses the pack's credits)
+bench-vs-closed:   ## open models vs GPT/Claude on the same scenarios (needs BASELINE_* keys in .env)
 	$(ACT) set -a; source .env; set +a; $(PY) bench/run_bench.py --provider $(PROVIDER) -m rules --baseline
 
 bench-live:        ## benchmark against the live broken cluster
@@ -144,7 +148,7 @@ bench-k8sgpt:      ## FirstCall vs k8sgpt on the live cluster, same Nebius model
 bench-mock:        ## benchmark pipeline dry run
 	$(ACT) FIRSTCALL_LLM=mock $(PY) bench/run_bench.py -m rules -m cascade
 
-e2e:               ## end-to-end: detect 8 -> diagnose -> events -> fix -> resolve (what CI runs)
+e2e:               ## end-to-end: detect all -> diagnose -> events -> fix -> resolve (what CI runs)
 	API_URL=$(API_URL) ./scripts/e2e.sh
 
 clean:

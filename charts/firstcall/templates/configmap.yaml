@@ -8,6 +8,7 @@ data:
   FIRSTCALL_DEFAULT_MODEL: {{ .Values.model.default | quote }}
   FIRSTCALL_SOURCE: cluster
   FIRSTCALL_NAMESPACES: {{ .Values.watch.namespaces | quote }}
+  FIRSTCALL_EXCLUDE_NAMESPACES: {{ trimSuffix "," (printf "%s,%s" .Release.Namespace .Values.watch.exclude) | quote }}
   FIRSTCALL_WATCH_INTERVAL: {{ .Values.watch.interval | quote }}
   FIRSTCALL_AUTO_DIAGNOSE: {{ .Values.watch.autoDiagnose | quote }}
   FIRSTCALL_AUTO_INVESTIGATE: {{ .Values.watch.autoInvestigate | quote }}

@@ -14,11 +14,17 @@ spec:
     metadata:
       labels: {{- include "firstcall.selector" . | nindent 8 }}
         app.kubernetes.io/component: web
+      {{- with .Values.podAnnotations }}
+      annotations: {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets: {{- toYaml . | nindent 8 }}
       {{- end }}
-      securityContext: {runAsNonRoot: true, runAsUser: 1000, seccompProfile: {type: RuntimeDefault}}
+      {{- with .Values.podSecurityContext.web }}
+      securityContext: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "firstcall.scheduling" . | nindent 6 }}
       containers:
         - name: web
           image: {{ include "firstcall.webImage" . }}

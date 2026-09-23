@@ -19,3 +19,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 {{- define "firstcall.apiImage" -}}{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}{{- end -}}
 {{- define "firstcall.webImage" -}}{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}{{- end -}}
+{{- define "firstcall.scheduling" -}}
+{{- with .Values.nodeSelector }}
+nodeSelector: {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.tolerations }}
+tolerations: {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.affinity }}
+affinity: {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end -}}

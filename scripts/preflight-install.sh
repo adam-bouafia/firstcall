@@ -2,7 +2,7 @@
 # Five seconds of checks that turn "context deadline exceeded" into a sentence.
 set -uo pipefail
 NS="${NS:-firstcall-system}"
-TAG="${TAG:-0.3.0}"
+TAG="${TAG:-0.4.0}"
 fail=0
 say() { printf '%s\n' "$*"; }
 

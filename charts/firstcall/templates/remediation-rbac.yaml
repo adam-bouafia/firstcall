@@ -1,4 +1,7 @@
 {{- if .Values.remediation.enabled }}
+{{- if eq (trim .Values.watch.namespaces) "*" }}
+{{- fail "remediation.enabled needs an explicit watch.namespaces list (RoleBindings are per namespace), not \"*\"" }}
+{{- end }}
 # Narrow write access, used ONLY after a human approves a specific fix that passed a server dry run.
 # Scoped per namespace with RoleBindings; nothing cluster-wide, no delete, no secrets, no exec.
 apiVersion: rbac.authorization.k8s.io/v1
