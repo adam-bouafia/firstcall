@@ -1,6 +1,6 @@
 """Live collector. Read-only: FirstCall only needs get/list/watch + pods/log.
 
-See infra/rbac.yaml for the exact ClusterRole to run it with least privilege.
+See charts/firstcall/templates/rbac.yaml for the exact ClusterRole to run it with least privilege.
 """
 import uuid
 from datetime import datetime, timezone
@@ -10,6 +10,12 @@ from kubernetes.client.rest import ApiException
 
 from app.k8s.source import ContextSource
 from app.schemas import Incident, Snapshot
+
+# A container that crashed less than this long ago is still an incident, whatever state it is in right now.
+# Crash loops pass through waiting (back-off), terminated (some kubelet versions report the back-off this
+# way) and a few seconds of running; without this window each healthy-looking moment resolves the incident
+# and the next crash opens a new one (re-diagnosed, re-paged).
+CRASH_WINDOW_S = 300
 
 BAD_WAITING = {
     "CrashLoopBackOff", "ImagePullBackOff", "ErrImagePull", "CreateContainerConfigError",
@@ -28,7 +34,7 @@ def _age(ts) -> str:
 
 
 class ClusterSource(ContextSource):
-    def __init__(self, namespaces: list[str], log_tail: int = 80):
+    def __init__(self, namespaces: list[str], log_tail: int = 80, exclude: list[str] | None = None):
         try:
             config.load_incluster_config()
         except config.ConfigException:
@@ -37,6 +43,7 @@ class ClusterSource(ContextSource):
         self.apps = client.AppsV1Api()
         self.custom = client.CustomObjectsApi()
         self.namespaces = namespaces
+        self.exclude = self.SYSTEM_NS | set(exclude or [])
         self.log_tail = log_tail
 
     # ---------- incident discovery ----------
@@ -46,11 +53,17 @@ class ClusterSource(ContextSource):
             for c in st.conditions or []:
                 if c.type == "PodScheduled" and c.status == "False":
                     return c.reason or "Unschedulable"
+        now = datetime.now(timezone.utc)
         for cs in (st.container_statuses or []) + (st.init_container_statuses or []):
-            if cs.last_state.terminated and cs.last_state.terminated.reason == "OOMKilled" and not cs.ready:
+            term, last = cs.state.terminated, cs.last_state.terminated
+            if not cs.ready and any(x and x.reason == "OOMKilled" for x in (term, last)):
                 return "OOMKilled"
             if cs.state.waiting and cs.state.waiting.reason in BAD_WAITING:
                 return cs.state.waiting.reason
+            if term and term.exit_code and not cs.ready:
+                return "CrashLoopBackOff" if cs.restart_count else (term.reason or "Error")
+            if last and last.exit_code and last.finished_at and (now - last.finished_at).total_seconds() < CRASH_WINDOW_S:
+                return "CrashLoopBackOff"
             if cs.state.running and not cs.ready:
                 return "NotReady"
         if st.phase in ("Pending", "Failed", "Unknown"):
@@ -62,7 +75,7 @@ class ClusterSource(ContextSource):
     def _namespaces(self) -> list[str]:
         if "*" not in self.namespaces:
             return self.namespaces
-        return [n.metadata.name for n in self.core.list_namespace().items if n.metadata.name not in self.SYSTEM_NS]
+        return [n.metadata.name for n in self.core.list_namespace().items if n.metadata.name not in self.exclude]
 
     def list_incidents(self) -> list[Incident]:
         items: list[Incident] = []
@@ -219,7 +232,12 @@ class ClusterSource(ContextSource):
                 diffs.append(f"{name}: env var {k} added")
             for k in be.keys() & ne.keys():
                 if be[k] != ne[k]:
-                    diffs.append(f"{name}: env var {k} value changed")
+                    # references (secretKeyRef, configMapKeyRef) are names, safe to show; literal values are not
+                    ref_o, ref_n = be[k].get("valueFrom"), ne[k].get("valueFrom")
+                    if ref_o or ref_n:
+                        diffs.append(f"{name}: env var {k} valueFrom {ref_o} -> {ref_n}")
+                    else:
+                        diffs.append(f"{name}: env var {k} value changed")
             if before.get("envFrom") != c.get("envFrom"):
                 diffs.append(f"{name}: envFrom {before.get('envFrom')} -> {c.get('envFrom')}")
             if before.get("resources") != c.get("resources"):
@@ -328,8 +346,18 @@ class ClusterSource(ContextSource):
             related={"pods_in_namespace": [
                 {"name": x.metadata.name, "labels": x.metadata.labels, "phase": x.status.phase}
                 for x in pods
-            ]},
+            ], "workloads_matching_selector": self._workloads_matching(ns, svc.spec.selector or {})},
         )
+
+    def _workloads_matching(self, ns: str, selector: dict) -> list[dict]:
+        """Deployments whose pod template the Service would select: tells "scaled to 0" apart from a label typo."""
+        out = []
+        for d in self.apps.list_namespaced_deployment(ns).items:
+            labels = (d.spec.template.metadata.labels or {}) if d.spec.template.metadata else {}
+            if selector and all(labels.get(k) == v for k, v in selector.items()):
+                out.append({"deployment": d.metadata.name, "replicas": d.spec.replicas,
+                            "ready_replicas": d.status.ready_replicas or 0})
+        return out
 
     # ---------- write-back ----------
     _KINDS = {

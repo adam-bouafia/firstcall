@@ -25,7 +25,7 @@ def get_source() -> ContextSource:
     if s.firstcall_source == "cluster":
         from app.k8s.cluster import ClusterSource
 
-        return ClusterSource(s.namespaces, s.firstcall_log_tail)
+        return ClusterSource(s.namespaces, s.firstcall_log_tail, s.exclude_namespaces)
     from app.k8s.fixtures import FixtureSource
 
     return FixtureSource(s.fixtures_dir)

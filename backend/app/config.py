@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     # Cluster
     firstcall_source: str = "cluster"  # cluster | fixtures
     firstcall_namespaces: str = "firstcall-demo"  # comma list, or * for all non-system namespaces
+    firstcall_exclude_namespaces: str = ""  # with *, also skip these (comma list)
     firstcall_log_tail: int = 80
     fixtures_dir: Path = ROOT / "scenarios" / "fixtures"
     kubectl_bin: str = "kubectl"
@@ -60,6 +61,10 @@ class Settings(BaseSettings):
     @property
     def namespaces(self) -> list[str]:
         return [n.strip() for n in self.firstcall_namespaces.split(",") if n.strip()]
+
+    @property
+    def exclude_namespaces(self) -> list[str]:
+        return [n.strip() for n in self.firstcall_exclude_namespaces.split(",") if n.strip()]
 
 
 @lru_cache
