@@ -1,0 +1,34 @@
+# ---- secrets. never commit these ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+kubeconfig*
+**/secrets.yaml
+charts/**/values.local.yaml
+
+# ---- python ----
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# ---- node / next ----
+node_modules/
+.next/
+frontend/out/
+.vercel/
+
+# ---- runtime data ----
+data/
+*.db
+*.sqlite3
+
+# ---- benchmark raw output: keep the .md tables, drop the bulky rows ----
+bench/results/*.csv
+bench/results/*.json
+!bench/results/.gitkeep
+
+# ---- build / publish output ----
+docs/site/
