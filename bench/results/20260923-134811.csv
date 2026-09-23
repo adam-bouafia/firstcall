@@ -1,0 +1,57 @@
+category_ok,command_ok,comparable,completion_tokens,confidence,cost_usd,detected,error,fix_ok,keyword_score,latency_ms,model,next_command,predicted,prompt_tokens,repeat,route,safe_cmd,scenario,score
+True,True,1.0,366,0.95,0.000617,True,,True,1.0,4309,qwen3-235b,kubectl get deployment payments-api -n firstcall-demo -o yaml,CrashLoop-AppError,1989,0,qwen3-235b,True,01-crashloop,1.0
+True,True,1.0,382,0.95,0.000447,True,,True,1.0,5824,qwen3-235b,kubectl describe pod checkout-web-5c7b9d8f4-k8wzt -n firstcall-demo,ImagePull,1089,0,qwen3-235b,True,02-imagepull,1.0
+True,False,0.6,374,0.95,0.000525,True,,True,1.0,6087,qwen3-235b,kubectl logs pod/report-worker-cd59f486-th2wx -n firstcall-demo -c worker --previous,OOMKilled,1501,0,qwen3-235b,True,03-oom,0.8
+True,False,0.6,375,0.95,0.000466,True,,,1.0,7640,qwen3-235b,kubectl describe deployment/ml-batch -n firstcall-demo,Unschedulable,1204,0,qwen3-235b,True,04-unschedulable,0.8
+True,True,1.0,401,0.95,0.000535,True,,True,1.0,9517,qwen3-235b,kubectl describe pod catalog-api-58fffc4469-vphrm -n firstcall-demo,ProbeFailure,1474,0,qwen3-235b,True,05-probe,1.0
+True,True,1.0,300,1.0,0.000435,True,,,1.0,7059,qwen3-235b,kubectl get configmap notify-config -n firstcall-demo,ConfigMissing,1275,0,qwen3-235b,True,06-config-missing,1.0
+True,False,0.6,312,0.95,0.000444,True,,True,1.0,5894,qwen3-235b,kubectl get pods -n firstcall-demo -l app=orders,ServiceSelector,1284,0,qwen3-235b,True,07-service-selector,0.8
+True,True,1.0,322,0.95,0.000436,True,,,1.0,5060,qwen3-235b,kubectl get storageclass -n firstcall-demo,StoragePending,1213,0,qwen3-235b,True,08-pvc-pending,1.0
+True,True,1.0,412,0.95,0.000322,True,,False,1.0,9316,qwen3-30b,kubectl describe pod payments-api-6bc9c4cdc5-p9zgr -n firstcall-demo,CrashLoop-AppError,1989,0,qwen3-30b,True,01-crashloop,1.0
+True,False,0.6,303,0.95,0.0002,True,,True,1.0,8502,qwen3-30b,kubectl get imagepolicy -n firstcall-demo,ImagePull,1089,0,qwen3-30b,True,02-imagepull,0.8
+True,True,1.0,419,0.95,0.000276,True,,True,1.0,18341,qwen3-30b,kubectl describe pod report-worker-cd59f486-th2wx -n firstcall-demo,OOMKilled,1501,0,qwen3-30b,True,03-oom,1.0
+True,True,1.0,340,0.95,0.000222,True,,,1.0,9615,qwen3-30b,kubectl describe node vm -n firstcall-demo,Unschedulable,1204,0,qwen3-30b,True,04-unschedulable,1.0
+True,True,1.0,440,0.95,0.000279,True,,True,1.0,14720,qwen3-30b,kubectl describe pod catalog-api-58fffc4469-vphrm -n firstcall-demo,ProbeFailure,1474,0,qwen3-30b,True,05-probe,1.0
+True,True,1.0,208,0.95,0.00019,True,,,1.0,5956,qwen3-30b,kubectl get configmap notify-config -n firstcall-demo,ConfigMissing,1275,0,qwen3-30b,True,06-config-missing,1.0
+True,False,0.6,298,0.95,0.000218,True,,True,1.0,10136,qwen3-30b,kubectl get service -n firstcall-demo orders -o yaml,ServiceSelector,1284,0,qwen3-30b,True,07-service-selector,0.8
+True,True,1.0,228,0.95,0.00019,True,,,1.0,10854,qwen3-30b,kubectl get storageclass fast-ssd -n firstcall-demo,StoragePending,1213,0,qwen3-30b,True,08-pvc-pending,1.0
+True,True,1.0,721,0.97,0.000726,True,,True,1.0,4610,gpt-oss-120b,kubectl describe pod payments-api-6bc9c4cdc5-p9zgr -n firstcall-demo,CrashLoop-AppError,1957,0,gpt-oss-120b,True,01-crashloop,1.0
+True,True,1.0,881,0.97,0.000699,True,,True,1.0,5011,gpt-oss-120b,kubectl describe pod checkout-web-5c7b9d8f4-k8wzt -n firstcall-demo,ImagePull,1136,0,gpt-oss-120b,True,02-imagepull,1.0
+True,True,1.0,825,0.96,0.000723,True,,True,1.0,3606,gpt-oss-120b,kubectl top pod report-worker-cd59f486-th2wx -n firstcall-demo,OOMKilled,1521,0,gpt-oss-120b,True,03-oom,1.0
+True,True,1.0,640,0.97,0.00057,True,,,1.0,2947,gpt-oss-120b,kubectl describe pod ml-batch-78c9b6c885-bbv5d -n firstcall-demo,Unschedulable,1239,0,gpt-oss-120b,True,04-unschedulable,1.0
+True,False,0.6,778,0.96,0.000694,True,,True,1.0,4194,gpt-oss-120b,kubectl get deployment/catalog-api -n firstcall-demo -o yaml,ProbeFailure,1512,0,gpt-oss-120b,True,05-probe,0.8
+True,True,1.0,471,0.96,0.00048,True,,,1.0,3482,gpt-oss-120b,kubectl get configmap notify-config -n firstcall-demo,ConfigMissing,1315,0,gpt-oss-120b,True,06-config-missing,1.0
+True,True,1.0,461,0.97,0.000472,True,,True,1.0,5014,gpt-oss-120b,kubectl get pods -l app=orders -n firstcall-demo,ServiceSelector,1305,0,gpt-oss-120b,True,07-service-selector,1.0
+True,True,1.0,728,0.97,0.000625,True,,,1.0,3275,gpt-oss-120b,kubectl get storageclass fast-ssd -n firstcall-demo,StoragePending,1253,0,gpt-oss-120b,True,08-pvc-pending,1.0
+True,True,1.0,1485,0.96,0.000483,True,,True,1.0,18749,nemotron-nano,kubectl get deployment payments-api -n firstcall-demo -o yaml,CrashLoop-AppError,2112,0,nemotron-nano,True,01-crashloop,1.0
+True,True,1.0,2188,0.96,0.000594,True,,True,1.0,27023,nemotron-nano,kubectl describe pod checkout-web-5c7b9d8f4-k8wzt -n firstcall-demo,ImagePull,1148,0,nemotron-nano,True,02-imagepull,1.0
+True,True,1.0,2857,0.96,0.000783,True,,True,1.0,36461,nemotron-nano,kubectl get pod report-worker-cd59f486-th2wx -n firstcall-demo -o jsonpath='{.status.containerStatuses[0].lastState.terminated}',OOMKilled,1620,0,nemotron-nano,True,03-oom,1.0
+True,False,0.6,1331,0.96,0.000396,True,,,1.0,17810,nemotron-nano,kubectl describe node vm,Unschedulable,1281,0,nemotron-nano,True,04-unschedulable,0.8
+True,False,0.6,934,0.96,0.000319,True,,True,1.0,12504,nemotron-nano,kubectl get deployment catalog-api -n firstcall-demo -o jsonpath='{.spec.template.spec.containers[0].readinessProbe}',ProbeFailure,1575,0,nemotron-nano,True,05-probe,0.8
+True,True,1.0,1101,0.96,0.000347,True,,,1.0,16065,nemotron-nano,kubectl get configmap notify-config -n firstcall-demo,ConfigMissing,1372,0,nemotron-nano,True,06-config-missing,1.0
+True,True,1.0,2970,0.96,0.000795,True,,True,1.0,39012,nemotron-nano,kubectl describe service orders -n firstcall-demo,ServiceSelector,1363,0,nemotron-nano,True,07-service-selector,1.0
+True,True,1.0,1437,0.96,0.000423,True,,,1.0,19558,nemotron-nano,kubectl describe pvc ledger-data -n firstcall-demo,StoragePending,1298,0,nemotron-nano,True,08-pvc-pending,1.0
+True,True,1.0,315,1.0,0.000305,True,,True,1.0,3591,gemma3-27b,kubectl describe pod payments-api-6bc9c4cdc5-p9zgr -n firstcall-demo,CrashLoop-AppError,2101,0,gemma3-27b,True,01-crashloop,1.0
+True,True,1.0,531,1.0,0.000273,True,,True,1.0,6238,gemma3-27b,kubectl describe pod checkout-web-5c7b9d8f4-k8wzt -n firstcall-demo,ImagePull,1138,0,gemma3-27b,True,02-imagepull,1.0
+True,True,1.0,478,1.0,0.000303,True,,True,1.0,18421,gemma3-27b,kubectl describe pod report-worker-cd59f486-th2wx -n firstcall-demo,OOMKilled,1592,0,gemma3-27b,True,03-oom,1.0
+True,True,1.0,355,1.0,0.000232,True,,,1.0,4720,gemma3-27b,kubectl describe node vm -n firstcall-demo,Unschedulable,1258,0,gemma3-27b,True,04-unschedulable,1.0
+False,True,1.0,508,0.0,0.000307,True,,False,1.0,5627,gemma3-27b,kubectl describe pod catalog-api-58fffc4469-vphrm -n firstcall-demo,Other,1550,0,gemma3-27b,True,05-probe,0.5
+True,True,1.0,307,1.0,0.000226,True,,,1.0,3842,gemma3-27b,kubectl get configmap -n firstcall-demo notify-config,ConfigMissing,1337,0,gemma3-27b,True,06-config-missing,1.0
+True,False,0.6,275,1.0,0.00022,True,,True,1.0,3633,gemma3-27b,kubectl get pods -n firstcall-demo -l app=orders,ServiceSelector,1378,0,gemma3-27b,True,07-service-selector,0.8
+True,True,1.0,335,1.0,0.000228,True,,,1.0,4606,gemma3-27b,kubectl describe pvc ledger-data -n firstcall-demo,StoragePending,1272,0,gemma3-27b,True,08-pvc-pending,1.0
+True,True,0.4,120,0.5,0.0,True,,True,0.0,200,rules,kubectl describe pod/payments-api-6bc9c4cdc5-p9zgr -n firstcall-demo,CrashLoop-AppError,1025,0,rules,True,01-crashloop,0.7
+True,True,0.4,120,0.5,0.0,True,,True,0.0,200,rules,kubectl describe pod/checkout-web-5c7b9d8f4-k8wzt -n firstcall-demo,ImagePull,347,0,rules,True,02-imagepull,0.7
+True,True,1.0,120,0.5,0.0,True,,True,1.0,200,rules,kubectl describe pod/report-worker-cd59f486-th2wx -n firstcall-demo,OOMKilled,764,0,rules,True,03-oom,1.0
+True,True,0.4,120,0.5,0.0,True,,,0.0,200,rules,kubectl describe pod/ml-batch-78c9b6c885-bbv5d -n firstcall-demo,Unschedulable,453,0,rules,True,04-unschedulable,0.7
+True,True,0.7,120,0.5,0.0,True,,True,0.5,200,rules,kubectl describe pod/catalog-api-58fffc4469-vphrm -n firstcall-demo,ProbeFailure,712,0,rules,True,05-probe,0.85
+True,True,0.7,120,0.5,0.0,True,,,0.5,200,rules,kubectl describe pod/notify-svc-5f5b786b44-k4x8g -n firstcall-demo,ConfigMissing,532,0,rules,True,06-config-missing,0.85
+True,True,0.7,120,0.5,0.0,True,,True,0.5,200,rules,kubectl describe service/orders -n firstcall-demo,ServiceSelector,442,0,rules,True,07-service-selector,0.85
+False,False,0.0,120,0.5,0.0,True,,,0.0,200,rules,kubectl describe pod/ledger-db-7b96cc4f68-5s82q -n firstcall-demo,Unschedulable,474,0,rules,True,08-pvc-pending,0.0
+True,True,1.0,677,0.95,0.0,True,,True,1.0,7752,baseline-anthropic:claude-sonnet-5,kubectl get deployment payments-api -n firstcall-demo -o jsonpath='{.spec.template.spec.containers[0].env}',CrashLoop-AppError,3066,0,baseline-anthropic:claude-sonnet-5,True,01-crashloop,1.0
+True,True,1.0,534,0.97,0.0,True,,True,1.0,7465,baseline-anthropic:claude-sonnet-5,kubectl describe pod checkout-web-5c7b9d8f4-k8wzt -n firstcall-demo,ImagePull,1713,0,baseline-anthropic:claude-sonnet-5,True,02-imagepull,1.0
+True,True,1.0,636,0.95,0.0,True,,True,1.0,7881,baseline-anthropic:claude-sonnet-5,kubectl describe pod report-worker-cd59f486-th2wx -n firstcall-demo,OOMKilled,2396,0,baseline-anthropic:claude-sonnet-5,True,03-oom,1.0
+True,True,1.0,564,0.97,0.0,True,,,1.0,7722,baseline-anthropic:claude-sonnet-5,kubectl describe node vm -n firstcall-demo,Unschedulable,1917,0,baseline-anthropic:claude-sonnet-5,True,04-unschedulable,1.0
+True,True,1.0,641,0.95,0.0,True,,True,1.0,7012,baseline-anthropic:claude-sonnet-5,kubectl describe pod catalog-api-58fffc4469-vphrm -n firstcall-demo,ProbeFailure,2386,0,baseline-anthropic:claude-sonnet-5,True,05-probe,1.0
+True,True,1.0,473,0.97,0.0,True,,,1.0,7261,baseline-anthropic:claude-sonnet-5,kubectl get configmap notify-config -n firstcall-demo,ConfigMissing,2038,0,baseline-anthropic:claude-sonnet-5,True,06-config-missing,1.0
+True,True,1.0,515,0.9,0.0,True,,True,1.0,6953,baseline-anthropic:claude-sonnet-5,kubectl get endpoints orders -n firstcall-demo -o wide,ServiceSelector,2013,0,baseline-anthropic:claude-sonnet-5,True,07-service-selector,1.0
+True,True,1.0,439,0.95,0.0,True,,,1.0,4293,baseline-anthropic:claude-sonnet-5,kubectl get storageclass -n firstcall-demo,StoragePending,1962,0,baseline-anthropic:claude-sonnet-5,True,08-pvc-pending,1.0
