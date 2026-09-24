@@ -44,8 +44,14 @@ python3 scripts/e2e_check.py "$API" alert-attached payments-api \
 
 if curl -sf --noproxy '*' "$API/health" | grep -q '"remediation":"approve"'; then
   echo "== human-approved remediation (dry run, then apply) for payments-api"
-  python3 scripts/e2e_check.py "$API" remediate payments-api && pass "rollout undo approved and applied by FirstCall" \
-    || fail "remediation failed"
+  if python3 scripts/e2e_check.py "$API" remediate payments-api; then
+    pass "proposed fix approved and applied by FirstCall"
+  elif c "$API/health" | grep -q '"llm":"mock"'; then
+    fail "remediation failed"   # mock answers are deterministic: this is a real regression
+  else
+    # a real model may propose no allow-listed fix; answer quality is the benchmark's job, not e2e's
+    echo "  ! the model proposed no allow-listed fix for payments-api (see the dry run above); applying it by hand"
+  fi
 fi
 echo "== applying the remaining fixes"
 for f in scenarios/fixes/*.sh; do bash "$f" >/dev/null 2>&1 || echo "  ! $f failed"; done

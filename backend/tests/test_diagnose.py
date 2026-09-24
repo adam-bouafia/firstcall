@@ -88,3 +88,11 @@ def test_provider_prefixed_model_id():
     assert m["provider"] == "groq" and m["id"] == "openai/gpt-oss-20b"
     with pytest.raises(RuntimeError):
         resolve_model("does-not-exist")
+
+
+def test_placeholder_fix_is_dropped():
+    # "<value-from-vault>" means a human must supply the value: never offer it as a one-click fix
+    d = parse_diagnosis('{"summary":"s","category":"CrashLoop-AppError","root_cause":"r","confidence":0.9,'
+                        '"next_command":"kubectl logs x -n firstcall-demo","fix":"f","remediation_command":'
+                        '"kubectl set env deployment/payments-api DATABASE_URL=<value-from-vault> -n firstcall-demo"}')
+    assert d.remediation_command == "" and not d.remediation_allowed

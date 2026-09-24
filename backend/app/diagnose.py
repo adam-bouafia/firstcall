@@ -36,6 +36,8 @@ def parse_diagnosis(text: str) -> Diagnosis:
         raw["category"] = "Other"
         d = Diagnosis(**raw)
     d.next_command_safe = is_safe(d.next_command)
+    if re.search(r"<[^<>\s]+>", d.remediation_command or ""):
+        d.remediation_command = ""  # "<value-from-vault>": a human must supply the value, not one click
     from app.config import get_settings
     from app.safety import remediation_check
     d.remediation_allowed = remediation_check(d.remediation_command, get_settings().namespaces)[0]
